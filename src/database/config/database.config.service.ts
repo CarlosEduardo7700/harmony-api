@@ -10,7 +10,7 @@ export class DatabaseConfigService implements TypeOrmOptionsFactory {
     return {
       type: 'mongodb',
       url: this.configService.get<string>('DB_URL'),
-      entities: [],
+      entities: [__dirname + '/../**/*.entity.{js,ts}'],
     };
   }
 }
