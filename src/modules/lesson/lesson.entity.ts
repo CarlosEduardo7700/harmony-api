@@ -11,29 +11,29 @@ import {
 @Entity({ name: 'lessons' })
 export class Lesson {
   @ObjectIdColumn()
-  id: ObjectId;
+  _id: ObjectId;
 
-  @Column({ name: 'title' })
+  @Column()
   title: string;
 
-  @Column({ name: 'start_time' })
-  startTime: Date;
+  @Column()
+  startTime: string;
 
-  @Column({ name: 'end_time' })
-  endTime: Date;
+  @Column()
+  endTime: string;
 
-  @Column({ name: 'lesson_date' })
+  @Column()
   lessonDate: Date;
 
-  @Column({ name: 'observations' })
+  @Column()
   observations: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn()
   deletedAt: Date;
 }
