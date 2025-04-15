@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Controller, Post, Body } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
@@ -23,8 +21,8 @@ export class LessonController {
     for (const lesson of googleCalendarResponse.lessons) {
       const lessonSaved = await this.lessonService.saveToDatabase(
         createLessonDto,
-        lesson.start.dateTime,
-        lesson.end.dateTime,
+        lesson.startDateTime,
+        lesson.endDateTime,
       );
 
       lessons.push(lessonSaved);
