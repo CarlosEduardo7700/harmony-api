@@ -2,6 +2,9 @@ export class CreateLessonDto {
   title: string;
   startTime: string;
   endTime: string;
-  lessonDate: Date;
+  startDate: string;
+  endDate: string;
+  daysWeek: string[];
   observations: string;
+  recurrence: number;
 }

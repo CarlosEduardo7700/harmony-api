@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateLessonDto } from './dto/create-lesson.dto';
+import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from './lesson.entity';
 import { Repository } from 'typeorm';
@@ -11,15 +11,24 @@ export class LessonService {
     private readonly lessonRepository: Repository<Lesson>,
   ) {}
 
-  async create(createLessonDto: CreateLessonDto) {
+  async saveToDatabase(
+    createLessonDto: CreateLessonDto,
+    lessonStartDateTime: string,
+    lessonEndDateTime: string,
+  ) {
     const lesson = new Lesson();
 
+    const startDateTime = lessonStartDateTime.replace('-03:00', '').split('T');
+    const endDateTime = lessonEndDateTime.replace('-03:00', '').split('T');
+
     lesson.title = createLessonDto.title;
-    lesson.startTime = createLessonDto.startTime;
-    lesson.endTime = createLessonDto.endTime;
-    lesson.lessonDate = createLessonDto.lessonDate;
+    lesson.startTime = startDateTime[1];
+    lesson.endTime = endDateTime[1];
+    lesson.lessonDate = startDateTime[0];
     lesson.observations = createLessonDto.observations;
 
-    return this.lessonRepository.save(lesson);
+    const response = await this.lessonRepository.save(lesson);
+
+    return response;
   }
 }

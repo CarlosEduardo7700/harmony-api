@@ -1,19 +1,39 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Controller, Post, Body } from '@nestjs/common';
 import { LessonService } from './lesson.service';
-import { CreateLessonDto } from './dto/create-lesson.dto';
+import { CreateLessonDto } from './dtos/create-lesson.dto';
+import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
+import { Lesson } from './lesson.entity';
 
 @Controller('lesson')
 export class LessonController {
-  constructor(private readonly lessonService: LessonService) {}
+  constructor(
+    private readonly lessonService: LessonService,
+    private readonly googleCalendarService: GoogleCalendarService,
+  ) {}
 
   @Post()
   async create(@Body() createLessonDto: CreateLessonDto) {
-    const lesson = await this.lessonService.create(createLessonDto);
+    const googleCalendarResponse =
+      await this.googleCalendarService.scheduleLesson(createLessonDto);
+
+    const lessons: Lesson[] = [];
+
+    for (const lesson of googleCalendarResponse.lessons) {
+      const lessonSaved = await this.lessonService.saveToDatabase(
+        createLessonDto,
+        lesson.start.dateTime,
+        lesson.end.dateTime,
+      );
+
+      lessons.push(lessonSaved);
+    }
 
     return {
-      lesson: lesson,
-      message: `Aula do dia ${createLessonDto.lessonDate} cadastrada com sucesso!`,
+      message: `Aulas cadastradas com sucesso!`,
+      lessonsData: lessons,
+      googleCalendarEventsData: googleCalendarResponse,
     };
   }
 }

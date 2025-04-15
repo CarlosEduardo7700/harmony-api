@@ -23,7 +23,7 @@ export class Lesson {
   endTime: string;
 
   @Column()
-  lessonDate: Date;
+  lessonDate: string;
 
   @Column()
   observations: string;
