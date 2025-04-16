@@ -25,11 +25,13 @@ export class GoogleCalendarService {
   ): Promise<ScheduleLessonDto> {
     const lessonStartDateTime = `${createLessonDto.startDate}T${createLessonDto.startTime}:00-03:00`;
     const lessonEndDateTime = `${createLessonDto.startDate}T${createLessonDto.endTime}:00-03:00`;
-    const date = new Date(`${createLessonDto.endDate}T23:59:59-03:00`);
     const periodEndDate =
-      date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      new Date(`${createLessonDto.endDate}T23:59:59-03:00`)
+        .toISOString()
+        .replace(/[-:]/g, '')
+        .split('.')[0] + 'Z';
 
-    const daysWeekToGoogleCalendar: Record<string, string> = {
+    const weekdaysToRRULE: Record<string, string> = {
       Monday: 'MO',
       Tuesday: 'TU',
       Wednesday: 'WE',
@@ -39,8 +41,8 @@ export class GoogleCalendarService {
       Sunday: 'SU',
     };
 
-    const daysWeek = createLessonDto.daysWeek
-      .map((day) => daysWeekToGoogleCalendar[day])
+    const weekdays = createLessonDto.weekdays
+      .map((day) => weekdaysToRRULE[day])
       .join(',');
 
     const lesson = {
@@ -55,21 +57,21 @@ export class GoogleCalendarService {
         timeZone: 'America/Sao_Paulo',
       },
       recurrence: [
-        `RRULE:FREQ=WEEKLY;BYDAY=${daysWeek};INTERVAL=${createLessonDto.recurrence};UNTIL=${periodEndDate}`,
+        `RRULE:FREQ=WEEKLY;BYDAY=${weekdays};INTERVAL=${createLessonDto.recurrence};UNTIL=${periodEndDate}`,
       ],
     };
 
     const calendarId = this.configService.get<string>('CALENDAR_ID');
 
-    const response = await this.calendar.events.insert({
-      calendarId,
+    const eventsCreated = await this.calendar.events.insert({
+      calendarId: calendarId,
       requestBody: lesson,
     });
 
-    const { id, summary, description, recurrence } = response.data;
+    const { id, summary, description, recurrence } = eventsCreated.data;
 
-    const lessonsCreated = await this.calendar.events.list({
-      calendarId,
+    const eventsList = await this.calendar.events.list({
+      calendarId: calendarId,
       timeMin: new Date(
         `${createLessonDto.startDate}T00:00:00-03:00`,
       ).toISOString(),
@@ -80,8 +82,8 @@ export class GoogleCalendarService {
       timeZone: 'America/Sao_Paulo',
     });
 
-    const listLessonsCreated = lessonsCreated.data.items
-      .filter((e) => e.recurringEventId === id)
+    const lessonsCreatedList = eventsList.data.items
+      .filter((event) => event.recurringEventId === id)
       .map((lesson) => {
         return {
           id: lesson.id,
@@ -96,7 +98,7 @@ export class GoogleCalendarService {
       summary: summary,
       description: description,
       recurrence: recurrence[0],
-      lessons: listLessonsCreated,
+      lessons: lessonsCreatedList,
     };
   }
 }

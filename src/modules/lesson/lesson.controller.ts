@@ -2,7 +2,7 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
-import { Lesson } from './lesson.entity';
+import { LessonDto } from './dtos/lesson.dto';
 
 @Controller('lesson')
 export class LessonController {
@@ -16,7 +16,7 @@ export class LessonController {
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLesson(createLessonDto);
 
-    const lessons: Lesson[] = [];
+    const lessonsList: LessonDto[] = [];
 
     for (const lesson of googleCalendarResponse.lessons) {
       const lessonSaved = await this.lessonService.saveToDatabase(
@@ -25,12 +25,12 @@ export class LessonController {
         lesson.endDateTime,
       );
 
-      lessons.push(lessonSaved);
+      lessonsList.push(lessonSaved);
     }
 
     return {
       message: `Aulas cadastradas com sucesso!`,
-      lessonsData: lessons,
+      lessonsData: lessonsList,
       googleCalendarEventsData: googleCalendarResponse,
     };
   }

@@ -3,6 +3,7 @@ import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from './lesson.entity';
 import { Repository } from 'typeorm';
+import { LessonDto } from './dtos/lesson.dto';
 
 @Injectable()
 export class LessonService {
@@ -15,7 +16,7 @@ export class LessonService {
     createLessonDto: CreateLessonDto,
     lessonStartDateTime: string,
     lessonEndDateTime: string,
-  ) {
+  ): Promise<LessonDto> {
     const lesson = new Lesson();
 
     const startDateTime = lessonStartDateTime.replace('-03:00', '').split('T');
@@ -27,8 +28,14 @@ export class LessonService {
     lesson.lessonDate = startDateTime[0];
     lesson.observations = createLessonDto.observations;
 
-    const response = await this.lessonRepository.save(lesson);
+    const databaseResponse = await this.lessonRepository.save(lesson);
 
-    return response;
+    return {
+      id: databaseResponse._id,
+      lessonDate: databaseResponse.lessonDate,
+      startTime: databaseResponse.startTime,
+      endTime: databaseResponse.endTime,
+      createdAt: databaseResponse.createdAt,
+    };
   }
 }

@@ -4,7 +4,7 @@ export class CreateLessonDto {
   endTime: string;
   startDate: string;
   endDate: string;
-  daysWeek: string[];
+  weekdays: string[];
   observations: string;
   recurrence: number;
 }
