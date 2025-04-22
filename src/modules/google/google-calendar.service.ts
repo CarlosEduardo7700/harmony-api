@@ -6,10 +6,12 @@ import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
 import { CreateLessonDto } from 'src/modules/lesson/dtos/create-lesson.dto';
 import { ScheduleLessonDto } from './dtos/schedule-lesson.dto';
+import { createEventWithRecurrence } from './utils/createEventWithRecurrence';
 
 @Injectable()
 export class GoogleCalendarService {
   private calendar;
+  private calendarId;
 
   constructor(private configService: ConfigService) {
     const auth = new google.auth.GoogleAuth({
@@ -18,60 +20,32 @@ export class GoogleCalendarService {
     });
 
     this.calendar = google.calendar({ version: 'v3', auth });
+    this.calendarId = this.configService.get<string>('CALENDAR_ID');
   }
 
   async scheduleLesson(
     createLessonDto: CreateLessonDto,
   ): Promise<ScheduleLessonDto> {
-    const lessonStartDateTime = `${createLessonDto.startDate}T${createLessonDto.startTime}:00-03:00`;
-    const lessonEndDateTime = `${createLessonDto.startDate}T${createLessonDto.endTime}:00-03:00`;
-    const periodEndDate =
-      new Date(`${createLessonDto.endDate}T23:59:59-03:00`)
-        .toISOString()
-        .replace(/[-:]/g, '')
-        .split('.')[0] + 'Z';
-
-    const weekdaysToRRULE: Record<string, string> = {
-      Monday: 'MO',
-      Tuesday: 'TU',
-      Wednesday: 'WE',
-      Thursday: 'TH',
-      Friday: 'FR',
-      Saturday: 'SA',
-      Sunday: 'SU',
-    };
-
-    const weekdays = createLessonDto.weekdays
-      .map((day) => weekdaysToRRULE[day])
-      .join(',');
-
-    const lesson = {
+    const lesson = createEventWithRecurrence({
       summary: createLessonDto.title,
       description: createLessonDto.observations,
-      start: {
-        dateTime: lessonStartDateTime,
-        timeZone: 'America/Sao_Paulo',
-      },
-      end: {
-        dateTime: lessonEndDateTime,
-        timeZone: 'America/Sao_Paulo',
-      },
-      recurrence: [
-        `RRULE:FREQ=WEEKLY;BYDAY=${weekdays};INTERVAL=${createLessonDto.recurrence};UNTIL=${periodEndDate}`,
-      ],
-    };
-
-    const calendarId = this.configService.get<string>('CALENDAR_ID');
+      startDate: createLessonDto.startDate,
+      startTime: createLessonDto.startTime,
+      endDate: createLessonDto.endDate,
+      endTime: createLessonDto.endTime,
+      weekdays: createLessonDto.weekdays,
+      interval: createLessonDto.recurrence,
+    });
 
     const eventsCreated = await this.calendar.events.insert({
-      calendarId: calendarId,
+      calendarId: this.calendarId,
       requestBody: lesson,
     });
 
     const { id, summary, description, recurrence } = eventsCreated.data;
 
     const eventsList = await this.calendar.events.list({
-      calendarId: calendarId,
+      calendarId: this.calendarId,
       timeMin: new Date(
         `${createLessonDto.startDate}T00:00:00-03:00`,
       ).toISOString(),
