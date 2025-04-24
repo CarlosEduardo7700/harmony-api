@@ -1,8 +1,9 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
 import { LessonDto } from './dtos/lesson.dto';
+import { LessonEventDto } from '../google/dtos/lesson-event.dto';
 
 @Controller('lesson')
 export class LessonController {
@@ -33,5 +34,17 @@ export class LessonController {
       lessonsData: lessonsList,
       googleCalendarEventsData: googleCalendarResponse,
     };
+  }
+
+  @Get()
+  async getLessonsEvents(
+    @Query('month') month: number,
+    @Query('year') year: number,
+  ): Promise<LessonEventDto[]> {
+    const lessonEventDto = await this.googleCalendarService.getLessonsEvents(
+      month,
+      year,
+    );
+    return lessonEventDto;
   }
 }

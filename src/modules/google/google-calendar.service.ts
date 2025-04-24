@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -7,6 +8,11 @@ import { google } from 'googleapis';
 import { CreateLessonDto } from 'src/modules/lesson/dtos/create-lesson.dto';
 import { ScheduleLessonDto } from './dtos/schedule-lesson.dto';
 import { createEventWithRecurrence } from './utils/createEventWithRecurrence';
+import { LessonEventDto } from './dtos/lesson-event.dto';
+import { getFirstDayOfTheMonth } from './utils/getFirstDayOfTheMonth';
+import { getLastDayOfTheMonth } from './utils/getLastDayOfTheMonth';
+import { getDateFromISOString } from './utils/getDateFromISOString';
+import { getTimeFromISOString } from './utils/getTimeFromISOString';
 
 @Injectable()
 export class GoogleCalendarService {
@@ -74,5 +80,42 @@ export class GoogleCalendarService {
       recurrence: recurrence[0],
       lessons: lessonsCreatedList,
     };
+  }
+
+  async getLessonsEvents(
+    month: number,
+    year: number,
+  ): Promise<LessonEventDto[]> {
+    const firstDayOfTheMonth = getFirstDayOfTheMonth(year, month);
+    const lastDayOfTheMonth = getLastDayOfTheMonth(year, month);
+
+    const lessonsEvents = await this.calendar.events.list({
+      calendarId: this.calendarId,
+      timeMin: firstDayOfTheMonth,
+      timeMax: lastDayOfTheMonth,
+      singleEvents: true,
+      orderBy: 'startTime',
+      timeZone: 'America/Sao_Paulo',
+    });
+
+    const lessonEventDto: LessonEventDto[] = lessonsEvents.data.items.map(
+      (lesson) => {
+        const startTime = getTimeFromISOString(lesson.start.dateTime);
+        const endTime = getTimeFromISOString(lesson.end.dateTime);
+        const lessonDate = getDateFromISOString(lesson.start.dateTime);
+
+        return new LessonEventDto(
+          lesson.id,
+          lesson.htmlLink,
+          lesson.summary,
+          lesson.description,
+          startTime,
+          endTime,
+          lessonDate,
+        );
+      },
+    );
+
+    return lessonEventDto;
   }
 }
