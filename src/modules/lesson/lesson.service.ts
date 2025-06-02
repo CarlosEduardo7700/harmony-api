@@ -31,7 +31,7 @@ export class LessonService {
     const databaseResponse = await this.lessonRepository.save(lesson);
 
     return {
-      id: databaseResponse._id,
+      id: databaseResponse.id,
       lessonDate: databaseResponse.lessonDate,
       startTime: databaseResponse.startTime,
       endTime: databaseResponse.endTime,

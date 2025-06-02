@@ -1,9 +1,7 @@
-import { ObjectId } from 'mongodb';
-
 export class LessonDto {
-  id: ObjectId;
+  id: string;
   lessonDate: string;
   startTime: string;
   endTime: string;
-  createdAt: Date;
+  createdAt: string;
 }

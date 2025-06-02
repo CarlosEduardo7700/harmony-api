@@ -1,39 +1,38 @@
-import { ObjectId } from 'mongodb';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ObjectIdColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'lessons' })
 export class Lesson {
-  @ObjectIdColumn()
-  _id: ObjectId;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column()
+  @Column({ name: 'title', length: 100, nullable: false })
   title: string;
 
-  @Column()
+  @Column({ name: 'start_time', nullable: false })
   startTime: string;
 
-  @Column()
+  @Column({ name: 'end_time', nullable: false })
   endTime: string;
 
-  @Column()
+  @Column({ name: 'lesson_date', nullable: false })
   lessonDate: string;
 
-  @Column()
+  @Column({ name: 'observations', length: 500 })
   observations: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: string;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: string;
 
-  @DeleteDateColumn()
-  deletedAt: Date;
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: string;
 }
