@@ -52,12 +52,8 @@ export class GoogleCalendarService {
 
     const eventsList = await this.calendar.events.list({
       calendarId: this.calendarId,
-      timeMin: new Date(
-        `${createLessonDto.startDate}T00:00:00-03:00`,
-      ).toISOString(),
-      timeMax: new Date(
-        `${createLessonDto.endDate}T23:59:59-03:00`,
-      ).toISOString(),
+      timeMin: new Date(`${createLessonDto.startDate}T00:00:00-03:00`),
+      timeMax: new Date(`${createLessonDto.endDate}T23:59:59-03:00`),
       singleEvents: true,
       timeZone: 'America/Sao_Paulo',
     });
