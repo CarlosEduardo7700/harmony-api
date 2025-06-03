@@ -40,6 +40,7 @@ export class GoogleCalendarService {
     });
 
     return {
+      eventId: eventCreated.data.id,
       eventLink: eventCreated.data.htmlLink,
     };
   }

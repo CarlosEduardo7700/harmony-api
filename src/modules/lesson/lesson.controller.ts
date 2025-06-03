@@ -23,7 +23,10 @@ export class LessonController {
 
     return {
       message: 'Aula agendada com sucesso!',
-      lessonData: { ...databaseResponse, ...googleCalendarResponse },
+      lessonData: {
+        ...databaseResponse,
+        googleCalendarEventData: { ...googleCalendarResponse },
+      },
     };
   }
 
