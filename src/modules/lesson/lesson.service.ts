@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from './lesson.entity';
 import { Repository } from 'typeorm';
 import { LessonDto } from './dtos/lesson.dto';
+import { CreateLessonDto } from './dtos/create-lesson.dto';
+import { convertUtcToBrIso } from 'src/utils/convertUtcToBrIso';
 
 @Injectable()
 export class LessonService {
@@ -12,30 +13,26 @@ export class LessonService {
     private readonly lessonRepository: Repository<Lesson>,
   ) {}
 
-  async saveToDatabase(
-    createLessonDto: CreateLessonDto,
-    lessonStartDateTime: string,
-    lessonEndDateTime: string,
-  ): Promise<LessonDto> {
+  async saveToDatabase(createLessonDto: CreateLessonDto): Promise<LessonDto> {
     const lesson = new Lesson();
-
-    const startDateTime = lessonStartDateTime.replace('-03:00', '').split('T');
-    const endDateTime = lessonEndDateTime.replace('-03:00', '').split('T');
-
     lesson.title = createLessonDto.title;
-    lesson.startTime = startDateTime[1];
-    lesson.endTime = endDateTime[1];
-    lesson.lessonDate = startDateTime[0];
+    lesson.startTime = createLessonDto.startTime;
+    lesson.endTime = createLessonDto.endTime;
+    lesson.lessonDate = createLessonDto.date;
     lesson.observations = createLessonDto.observations;
+    lesson.createdAt = new Date().toISOString();
+    lesson.updatedAt = new Date().toISOString();
 
     const databaseResponse = await this.lessonRepository.save(lesson);
 
     return {
       id: databaseResponse.id,
+      title: databaseResponse.title,
       lessonDate: databaseResponse.lessonDate,
       startTime: databaseResponse.startTime,
       endTime: databaseResponse.endTime,
-      createdAt: databaseResponse.createdAt,
+      observations: databaseResponse.observations,
+      createdAt: convertUtcToBrIso(databaseResponse.createdAt),
     };
   }
 }

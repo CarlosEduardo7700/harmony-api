@@ -2,8 +2,9 @@ import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
-import { LessonDto } from './dtos/lesson.dto';
+// import { LessonDto } from './dtos/lesson.dto';
 import { LessonEventDto } from '../google/dtos/lesson-event.dto';
+import { CreateLessonWithRecurrenceDto } from './dtos/create-lesson-with-recurrence.dto';
 
 @Controller('lesson')
 export class LessonController {
@@ -13,25 +14,43 @@ export class LessonController {
   ) {}
 
   @Post()
-  async create(@Body() createLessonDto: CreateLessonDto) {
+  async scheduleLesson(@Body() createLessonDto: CreateLessonDto) {
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLesson(createLessonDto);
 
-    const lessonsList: LessonDto[] = [];
+    const databaseResponse =
+      await this.lessonService.saveToDatabase(createLessonDto);
 
-    for (const lesson of googleCalendarResponse.lessons) {
-      const lessonSaved = await this.lessonService.saveToDatabase(
+    return {
+      message: 'Aula agendada com sucesso!',
+      lessonData: { ...databaseResponse, ...googleCalendarResponse },
+    };
+  }
+
+  @Post('/schedule-with-recurrence')
+  async scheduleLessonsWithRecurrence(
+    @Body() createLessonDto: CreateLessonWithRecurrenceDto,
+  ) {
+    const googleCalendarResponse =
+      await this.googleCalendarService.scheduleLessonsWithRecurrence(
         createLessonDto,
-        lesson.startDateTime,
-        lesson.endDateTime,
       );
 
-      lessonsList.push(lessonSaved);
-    }
+    // const lessonsList: LessonDto[] = [];
+
+    // for (const lesson of googleCalendarResponse.lessons) {
+    //   const lessonSaved = await this.lessonService.saveToDatabase(
+    //     createLessonDto,
+    //     lesson.startDateTime,
+    //     lesson.endDateTime,
+    //   );
+
+    //   lessonsList.push(lessonSaved);
+    // }
 
     return {
       message: `Aulas cadastradas com sucesso!`,
-      lessonsData: lessonsList,
+      // lessonsData: lessonsList,
       googleCalendarEventsData: googleCalendarResponse,
     };
   }

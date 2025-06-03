@@ -13,6 +13,8 @@ import { getFirstDayOfTheMonth } from './utils/getFirstDayOfTheMonth';
 import { getLastDayOfTheMonth } from './utils/getLastDayOfTheMonth';
 import { getDateFromISOString } from './utils/getDateFromISOString';
 import { getTimeFromISOString } from './utils/getTimeFromISOString';
+import { createEvent } from './utils/createEvent';
+import { CreateLessonWithRecurrenceDto } from '../lesson/dtos/create-lesson-with-recurrence.dto';
 
 @Injectable()
 export class GoogleCalendarService {
@@ -29,8 +31,21 @@ export class GoogleCalendarService {
     this.calendarId = this.configService.get<string>('CALENDAR_ID');
   }
 
-  async scheduleLesson(
-    createLessonDto: CreateLessonDto,
+  async scheduleLesson(createLessonDto: CreateLessonDto) {
+    const lesson = createEvent(createLessonDto);
+
+    const eventCreated = await this.calendar.events.insert({
+      calendarId: this.calendarId,
+      requestBody: lesson,
+    });
+
+    return {
+      eventLink: eventCreated.data.htmlLink,
+    };
+  }
+
+  async scheduleLessonsWithRecurrence(
+    createLessonDto: CreateLessonWithRecurrenceDto,
   ): Promise<ScheduleLessonDto> {
     const lesson = createEventWithRecurrence({
       summary: createLessonDto.title,
