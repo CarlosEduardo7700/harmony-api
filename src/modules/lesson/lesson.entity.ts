@@ -5,6 +5,9 @@ export class Lesson {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ name: 'google_event_id', length: 100, nullable: false })
+  googleEventId: string;
+
   @Column({ name: 'title', length: 100, nullable: false })
   title: string;
 

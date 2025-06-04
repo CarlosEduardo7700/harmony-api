@@ -13,13 +13,17 @@ export class LessonService {
     private readonly lessonRepository: Repository<Lesson>,
   ) {}
 
-  async saveToDatabase(createLessonDto: CreateLessonDto): Promise<LessonDto> {
+  async saveToDatabase(
+    createLessonDto: CreateLessonDto,
+    googleEventId: string,
+  ): Promise<LessonDto> {
     const lesson = new Lesson();
     lesson.title = createLessonDto.title;
     lesson.startTime = createLessonDto.startTime;
     lesson.endTime = createLessonDto.endTime;
     lesson.lessonDate = createLessonDto.date;
     lesson.observations = createLessonDto.observations;
+    lesson.googleEventId = googleEventId;
     lesson.createdAt = new Date().toISOString();
     lesson.updatedAt = new Date().toISOString();
 

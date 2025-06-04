@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
 // import { LessonDto } from './dtos/lesson.dto';
 import { LessonEventDto } from '../google/dtos/lesson-event.dto';
-import { CreateLessonWithRecurrenceDto } from './dtos/create-lesson-with-recurrence.dto';
+import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
 
 @Controller('lesson')
 export class LessonController {
@@ -18,8 +19,10 @@ export class LessonController {
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLesson(createLessonDto);
 
-    const databaseResponse =
-      await this.lessonService.saveToDatabase(createLessonDto);
+    const databaseResponse = await this.lessonService.saveToDatabase(
+      createLessonDto,
+      googleCalendarResponse.eventId,
+    );
 
     return {
       message: 'Aula agendada com sucesso!',
@@ -32,21 +35,20 @@ export class LessonController {
 
   @Post('/schedule-with-recurrence')
   async scheduleLessonsWithRecurrence(
-    @Body() createLessonDto: CreateLessonWithRecurrenceDto,
+    @Body() createLessonsDto: CreateLessonsWithRecurrenceDto,
   ) {
+    // Schedule in the Google Calendar
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLessonsWithRecurrence(
-        createLessonDto,
+        createLessonsDto,
       );
 
+    // Save to Postgres database
     // const lessonsList: LessonDto[] = [];
 
     // for (const lesson of googleCalendarResponse.lessons) {
-    //   const lessonSaved = await this.lessonService.saveToDatabase(
-    //     createLessonDto,
-    //     lesson.startDateTime,
-    //     lesson.endDateTime,
-    //   );
+    //   const lessonSaved =
+    //     await this.lessonService.saveToDatabase(createLessonsDto);
 
     //   lessonsList.push(lessonSaved);
     // }
