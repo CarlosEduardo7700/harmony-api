@@ -1,4 +1,4 @@
-export class CreateLessonWithRecurrenceDto {
+export class CreateLessonsWithRecurrenceDto {
   title: string;
   startTime: string;
   endTime: string;

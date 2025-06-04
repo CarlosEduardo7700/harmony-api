@@ -1,40 +1,18 @@
+import { CreateLessonsWithRecurrenceDto } from 'src/modules/lesson/dtos/create-lessons-with-recurrence.dto';
 import { convertWeekdaysToRRULE } from './convertWeekdaysToRRULE';
+import { convertDateToRRuleUntil } from './convertDateToRRuleUntil';
 
-interface RecurringEventData {
-  summary: string;
-  description: string;
-  startDate: string;
-  startTime: string;
-  endDate: string;
-  endTime: string;
-  weekdays: string[];
-  interval: number;
-}
-
-export function createEventWithRecurrence(data: RecurringEventData) {
-  const {
-    summary,
-    description,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    weekdays,
-    interval,
-  } = data;
-
-  const lessonStartDateTime = `${startDate}T${startTime}:00-03:00`;
-  const lessonEndDateTime = `${startDate}T${endTime}:00-03:00`;
-  const periodEndDate =
-    new Date(`${endDate}T23:59:59-03:00`)
-      .toISOString()
-      .replace(/[-:]/g, '')
-      .split('.')[0] + 'Z';
-  const weekdaysConverted = convertWeekdaysToRRULE(weekdays);
+export function createEventWithRecurrence(
+  createLessonsDto: CreateLessonsWithRecurrenceDto,
+) {
+  const lessonStartDateTime = `${createLessonsDto.startDate}T${createLessonsDto.startTime}:00-03:00`;
+  const lessonEndDateTime = `${createLessonsDto.startDate}T${createLessonsDto.endTime}:00-03:00`;
+  const periodEndDate = convertDateToRRuleUntil(createLessonsDto.endDate);
+  const weekdaysConverted = convertWeekdaysToRRULE(createLessonsDto.weekdays);
 
   return {
-    summary: summary,
-    description: description,
+    summary: createLessonsDto.title,
+    description: createLessonsDto.observations,
     start: {
       dateTime: lessonStartDateTime,
       timeZone: 'America/Sao_Paulo',
@@ -44,7 +22,7 @@ export function createEventWithRecurrence(data: RecurringEventData) {
       timeZone: 'America/Sao_Paulo',
     },
     recurrence: [
-      `RRULE:FREQ=WEEKLY;BYDAY=${weekdaysConverted};INTERVAL=${interval};UNTIL=${periodEndDate}`,
+      `RRULE:FREQ=WEEKLY;BYDAY=${weekdaysConverted};INTERVAL=${createLessonsDto.recurrence};UNTIL=${periodEndDate}`,
     ],
   };
 }
