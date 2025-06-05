@@ -1,4 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
@@ -19,16 +21,16 @@ export class LessonController {
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLesson(createLessonDto);
 
-    const databaseResponse = await this.lessonService.saveToDatabase(
-      createLessonDto,
-      googleCalendarResponse.eventId,
-    );
+    const databaseResponse = await this.lessonService.saveToDatabase({
+      ...createLessonDto,
+      googleEventId: googleCalendarResponse.eventId,
+      googleEventLink: googleCalendarResponse.eventLink,
+    });
 
     return {
       message: 'Aula agendada com sucesso!',
       lessonData: {
         ...databaseResponse,
-        googleCalendarEventData: { ...googleCalendarResponse },
       },
     };
   }
@@ -44,19 +46,19 @@ export class LessonController {
       );
 
     // Save to Postgres database
-    // const lessonsList: LessonDto[] = [];
-
-    // for (const lesson of googleCalendarResponse.lessons) {
-    //   const lessonSaved =
-    //     await this.lessonService.saveToDatabase(createLessonsDto);
-
-    //   lessonsList.push(lessonSaved);
-    // }
+    for (const lesson of googleCalendarResponse) {
+      await this.lessonService.saveToDatabase(lesson);
+    }
 
     return {
       message: `Aulas cadastradas com sucesso!`,
-      // lessonsData: lessonsList,
-      googleCalendarEventsData: googleCalendarResponse,
+      data: {
+        recurringEventId: googleCalendarResponse[0].recurringEventId,
+        title: googleCalendarResponse[0].title,
+        observations: googleCalendarResponse[0].observations,
+        startTime: googleCalendarResponse[0].startTime,
+        endTime: googleCalendarResponse[0].endTime,
+      },
     };
   }
 

@@ -8,6 +8,9 @@ export class Lesson {
   @Column({ name: 'google_event_id', length: 100, nullable: false })
   googleEventId: string;
 
+  @Column({ name: 'google_event_link', length: 210, nullable: false })
+  googleEventLink: string;
+
   @Column({ name: 'title', length: 100, nullable: false })
   title: string;
 
