@@ -39,13 +39,11 @@ export class LessonController {
   async scheduleLessonsWithRecurrence(
     @Body() createLessonsDto: CreateLessonsWithRecurrenceDto,
   ) {
-    // Schedule in the Google Calendar
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLessonsWithRecurrence(
         createLessonsDto,
       );
 
-    // Save to Postgres database
     for (const lesson of googleCalendarResponse) {
       await this.lessonService.saveToDatabase(lesson);
     }
