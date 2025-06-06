@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
-import { LessonDto } from './dtos/lesson.dto';
+// import { LessonDto } from './dtos/lesson.dto';
 import { LessonEventDto } from '../google/dtos/lesson-event.dto';
+import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
 
 @Controller('lesson')
 export class LessonController {
@@ -13,26 +17,46 @@ export class LessonController {
   ) {}
 
   @Post()
-  async create(@Body() createLessonDto: CreateLessonDto) {
+  async scheduleLesson(@Body() createLessonDto: CreateLessonDto) {
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLesson(createLessonDto);
 
-    const lessonsList: LessonDto[] = [];
+    const databaseResponse = await this.lessonService.saveToDatabase({
+      ...createLessonDto,
+      googleEventId: googleCalendarResponse.eventId,
+      googleEventLink: googleCalendarResponse.eventLink,
+    });
 
-    for (const lesson of googleCalendarResponse.lessons) {
-      const lessonSaved = await this.lessonService.saveToDatabase(
-        createLessonDto,
-        lesson.startDateTime,
-        lesson.endDateTime,
+    return {
+      message: 'Aula agendada com sucesso!',
+      lessonData: {
+        ...databaseResponse,
+      },
+    };
+  }
+
+  @Post('/schedule-with-recurrence')
+  async scheduleLessonsWithRecurrence(
+    @Body() createLessonsDto: CreateLessonsWithRecurrenceDto,
+  ) {
+    const googleCalendarResponse =
+      await this.googleCalendarService.scheduleLessonsWithRecurrence(
+        createLessonsDto,
       );
 
-      lessonsList.push(lessonSaved);
+    for (const lesson of googleCalendarResponse) {
+      await this.lessonService.saveToDatabase(lesson);
     }
 
     return {
       message: `Aulas cadastradas com sucesso!`,
-      lessonsData: lessonsList,
-      googleCalendarEventsData: googleCalendarResponse,
+      data: {
+        recurringEventId: googleCalendarResponse[0].recurringEventId,
+        title: googleCalendarResponse[0].title,
+        observations: googleCalendarResponse[0].observations,
+        startTime: googleCalendarResponse[0].startTime,
+        endTime: googleCalendarResponse[0].endTime,
+      },
     };
   }
 

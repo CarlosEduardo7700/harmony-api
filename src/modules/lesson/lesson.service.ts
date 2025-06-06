@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
-import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from './lesson.entity';
 import { Repository } from 'typeorm';
 import { LessonDto } from './dtos/lesson.dto';
+import { convertUtcToBrIso } from 'src/utils/convertUtcToBrIso';
 
 @Injectable()
 export class LessonService {
@@ -12,30 +14,30 @@ export class LessonService {
     private readonly lessonRepository: Repository<Lesson>,
   ) {}
 
-  async saveToDatabase(
-    createLessonDto: CreateLessonDto,
-    lessonStartDateTime: string,
-    lessonEndDateTime: string,
-  ): Promise<LessonDto> {
+  async saveToDatabase(data): Promise<LessonDto> {
     const lesson = new Lesson();
-
-    const startDateTime = lessonStartDateTime.replace('-03:00', '').split('T');
-    const endDateTime = lessonEndDateTime.replace('-03:00', '').split('T');
-
-    lesson.title = createLessonDto.title;
-    lesson.startTime = startDateTime[1];
-    lesson.endTime = endDateTime[1];
-    lesson.lessonDate = startDateTime[0];
-    lesson.observations = createLessonDto.observations;
+    lesson.title = data.title;
+    lesson.startTime = data.startTime;
+    lesson.endTime = data.endTime;
+    lesson.lessonDate = data.date;
+    lesson.observations = data.observations;
+    lesson.googleEventId = data.googleEventId;
+    lesson.googleEventLink = data.googleEventLink;
+    lesson.createdAt = new Date().toISOString();
+    lesson.updatedAt = new Date().toISOString();
 
     const databaseResponse = await this.lessonRepository.save(lesson);
 
     return {
       id: databaseResponse.id,
+      title: databaseResponse.title,
       lessonDate: databaseResponse.lessonDate,
       startTime: databaseResponse.startTime,
       endTime: databaseResponse.endTime,
-      createdAt: databaseResponse.createdAt,
+      observations: databaseResponse.observations,
+      googleEventId: databaseResponse.googleEventId,
+      googleEventLink: databaseResponse.googleEventLink,
+      createdAt: convertUtcToBrIso(databaseResponse.createdAt),
     };
   }
 }

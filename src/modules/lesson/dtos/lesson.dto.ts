@@ -1,7 +1,11 @@
 export class LessonDto {
   id: string;
-  lessonDate: string;
+  googleEventId: string;
+  googleEventLink: string;
+  title: string;
+  lessonDate: string | null;
   startTime: string;
   endTime: string;
-  createdAt: string;
+  observations: string;
+  createdAt: string | null;
 }

@@ -1,16 +1,15 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'lessons' })
 export class Lesson {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ name: 'google_event_id', length: 100, nullable: false })
+  googleEventId: string;
+
+  @Column({ name: 'google_event_link', length: 210, nullable: false })
+  googleEventLink: string;
 
   @Column({ name: 'title', length: 100, nullable: false })
   title: string;
@@ -27,12 +26,12 @@ export class Lesson {
   @Column({ name: 'observations', length: 500 })
   observations: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @Column({ name: 'created_at', nullable: true })
   createdAt: string;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @Column({ name: 'updated_at', nullable: true })
   updatedAt: string;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @Column({ name: 'deleted_at', nullable: true })
   deletedAt: string;
 }
