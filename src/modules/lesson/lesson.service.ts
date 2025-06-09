@@ -79,10 +79,9 @@ export class LessonService {
     const databaseResponse = await this.lessonRepository.save(lesson);
 
     return {
-      id: databaseResponse.id,
-      googleEventId: databaseResponse.googleEventId,
       title: databaseResponse.title,
       lessonDate: databaseResponse.lessonDate,
+      googleEventId: databaseResponse.googleEventId,
     };
   }
 }

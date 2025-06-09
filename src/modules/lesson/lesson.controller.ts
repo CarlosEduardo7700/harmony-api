@@ -103,14 +103,14 @@ export class LessonController {
 
   @Delete('/:id')
   async cancelLesson(@Param('id') id: string) {
-    // TODO: Soft Delete in the Database
     const lessonCanceled = await this.lessonService.cancelLesson(id);
 
-    // TODO: Cancel event in the Calendar
-    // await this.googleCalendarService.cancelLessonEvent(id);
+    await this.googleCalendarService.cancelLessonEvent(
+      lessonCanceled.googleEventId,
+    );
 
     return {
-      message: `Aula do dia ${lessonCanceled.lessonDate} cancelada!`,
+      message: `Aula do dia ${lessonCanceled.lessonDate.slice(-2)} cancelada!`,
       data: lessonCanceled,
     };
   }
