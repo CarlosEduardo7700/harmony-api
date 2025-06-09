@@ -1,13 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Query,
+  Param,
+  Patch,
+} from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
 // import { LessonDto } from './dtos/lesson.dto';
 import { LessonEventDto } from '../google/dtos/lesson-event.dto';
 import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
+import { UpdateLessonDto } from './dtos/update-lesson.dto';
 
 @Controller('lesson')
 export class LessonController {
@@ -70,5 +78,25 @@ export class LessonController {
       year,
     );
     return lessonEventDto;
+  }
+
+  @Patch('/:id')
+  async editLesson(
+    @Param('id') id: string,
+    @Body() updateLessonDto: UpdateLessonDto,
+  ) {
+    await this.googleCalendarService.editLessonEvent(updateLessonDto);
+
+    const lessonUpdated = await this.lessonService.editLesson(
+      id,
+      updateLessonDto,
+    );
+
+    return {
+      message: 'Aula atualizada com sucesso!',
+      data: {
+        ...lessonUpdated,
+      },
+    };
   }
 }

@@ -15,6 +15,8 @@ import { getDateFromISOString } from './utils/getDateFromISOString';
 import { getTimeFromISOString } from './utils/getTimeFromISOString';
 import { createEvent } from './utils/createEvent';
 import { CreateLessonsWithRecurrenceDto } from '../lesson/dtos/create-lessons-with-recurrence.dto';
+import { UpdateLessonDto } from '../lesson/dtos/update-lesson.dto';
+import { updateEvent } from './utils/updateEvent';
 
 @Injectable()
 export class GoogleCalendarService {
@@ -72,7 +74,7 @@ export class GoogleCalendarService {
           title: lesson.summary,
           startTime: createLessonsDto.startTime,
           endTime: createLessonsDto.endTime,
-          date: getDateFromISOString(lesson.start.dateTime),
+          lessonDate: getDateFromISOString(lesson.start.dateTime),
           observations: lesson.description,
         };
       });
@@ -98,8 +100,8 @@ export class GoogleCalendarService {
 
     const lessonEventDto: LessonEventDto[] = lessonsEvents.data.items.map(
       (lesson) => {
-        const startTime = getTimeFromISOString(lesson.start.dateTime);
-        const endTime = getTimeFromISOString(lesson.end.dateTime);
+        const startTime = getTimeFromISOString(lesson.start.dateTime) + ':00';
+        const endTime = getTimeFromISOString(lesson.end.dateTime) + ':00';
         const lessonDate = getDateFromISOString(lesson.start.dateTime);
 
         return new LessonEventDto(
@@ -115,5 +117,22 @@ export class GoogleCalendarService {
     );
 
     return lessonEventDto;
+  }
+
+  async editLessonEvent(updateLessonDto: UpdateLessonDto) {
+    const lessonEvent = await this.calendar.events.get({
+      calendarId: this.calendarId,
+      eventId: updateLessonDto.googleEventId,
+    });
+
+    const lessonData = updateEvent(updateLessonDto, lessonEvent);
+
+    const response = await this.calendar.events.patch({
+      calendarId: this.calendarId,
+      eventId: updateLessonDto.googleEventId,
+      requestBody: lessonData,
+    });
+
+    return response;
   }
 }
