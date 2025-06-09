@@ -6,6 +6,7 @@ import { Lesson } from './lesson.entity';
 import { Repository } from 'typeorm';
 import { LessonDto } from './dtos/lesson.dto';
 import { convertUtcToBrIso } from 'src/utils/convertUtcToBrIso';
+import { UpdateLessonDto } from './dtos/update-lesson.dto';
 
 @Injectable()
 export class LessonService {
@@ -19,7 +20,7 @@ export class LessonService {
     lesson.title = data.title;
     lesson.startTime = data.startTime;
     lesson.endTime = data.endTime;
-    lesson.lessonDate = data.date;
+    lesson.lessonDate = data.lessonDate;
     lesson.observations = data.observations;
     lesson.googleEventId = data.googleEventId;
     lesson.googleEventLink = data.googleEventLink;
@@ -38,6 +39,31 @@ export class LessonService {
       googleEventId: databaseResponse.googleEventId,
       googleEventLink: databaseResponse.googleEventLink,
       createdAt: convertUtcToBrIso(databaseResponse.createdAt),
+    };
+  }
+
+  async editLesson(id: string, updateLessonDto: UpdateLessonDto) {
+    const lesson = await this.lessonRepository.findOneBy({ id });
+
+    if (!lesson) {
+      throw new Error('Aula não encontrada!');
+    }
+
+    updateLessonDto['updatedAt'] = new Date().toISOString();
+
+    Object.assign(lesson, updateLessonDto);
+
+    const databaseResponse = await this.lessonRepository.save(lesson);
+
+    return {
+      id: databaseResponse.id,
+      title: databaseResponse.title,
+      lessonDate: databaseResponse.lessonDate,
+      startTime: databaseResponse.startTime,
+      endTime: databaseResponse.endTime,
+      observations: databaseResponse.observations,
+      googleEventId: databaseResponse.googleEventId,
+      googleEventLink: databaseResponse.googleEventLink,
     };
   }
 }
