@@ -8,6 +8,7 @@ import {
   Query,
   Param,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
@@ -97,6 +98,20 @@ export class LessonController {
       data: {
         ...lessonUpdated,
       },
+    };
+  }
+
+  @Delete('/:id')
+  async cancelLesson(@Param('id') id: string) {
+    // TODO: Soft Delete in the Database
+    const lessonCanceled = await this.lessonService.cancelLesson(id);
+
+    // TODO: Cancel event in the Calendar
+    // await this.googleCalendarService.cancelLessonEvent(id);
+
+    return {
+      message: `Aula do dia ${lessonCanceled.lessonDate} cancelada!`,
+      data: lessonCanceled,
     };
   }
 }

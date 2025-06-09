@@ -66,4 +66,23 @@ export class LessonService {
       googleEventLink: databaseResponse.googleEventLink,
     };
   }
+
+  async cancelLesson(id: string) {
+    const lesson = await this.lessonRepository.findOneBy({ id });
+
+    if (!lesson) {
+      throw new Error('Aula não encontrada!');
+    }
+
+    lesson['deletedAt'] = new Date().toISOString();
+
+    const databaseResponse = await this.lessonRepository.save(lesson);
+
+    return {
+      id: databaseResponse.id,
+      googleEventId: databaseResponse.googleEventId,
+      title: databaseResponse.title,
+      lessonDate: databaseResponse.lessonDate,
+    };
+  }
 }
