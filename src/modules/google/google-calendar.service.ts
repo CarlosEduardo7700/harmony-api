@@ -135,4 +135,11 @@ export class GoogleCalendarService {
 
     return response;
   }
+
+  async cancelLessonEvent(eventId: string) {
+    await this.calendar.events.delete({
+      calendarId: this.calendarId,
+      eventId: eventId,
+    });
+  }
 }
