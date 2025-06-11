@@ -3,7 +3,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from './lesson.entity';
-import { Repository } from 'typeorm';
+import { Between, IsNull, Repository } from 'typeorm';
 import { LessonDto } from './dtos/lesson.dto';
 import { convertUtcToBrIso } from 'src/utils/convertUtcToBrIso';
 import { UpdateLessonDto } from './dtos/update-lesson.dto';
@@ -83,5 +83,32 @@ export class LessonService {
       lessonDate: databaseResponse.lessonDate,
       googleEventId: databaseResponse.googleEventId,
     };
+  }
+
+  async getLessons(month: number, year: number) {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
+
+    const lessons = await this.lessonRepository.find({
+      where: {
+        lessonDate: Between(startDate, endDate),
+        deletedAt: IsNull(),
+      },
+    });
+
+    const lessonsList = lessons.map((lesson) => {
+      return {
+        id: lesson.id,
+        googleEventId: lesson.googleEventId,
+        googleEventLink: lesson.googleEventLink,
+        title: lesson.title,
+        lessonDate: lesson.lessonDate,
+        startTime: lesson.startTime,
+        endTime: lesson.endTime,
+        observation: lesson.observations,
+      };
+    });
+
+    return lessonsList;
   }
 }

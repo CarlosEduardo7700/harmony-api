@@ -14,7 +14,6 @@ import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
 // import { LessonDto } from './dtos/lesson.dto';
-import { LessonEventDto } from '../google/dtos/lesson-event.dto';
 import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
 import { UpdateLessonDto } from './dtos/update-lesson.dto';
 
@@ -70,15 +69,9 @@ export class LessonController {
   }
 
   @Get()
-  async getLessonsEvents(
-    @Query('month') month: number,
-    @Query('year') year: number,
-  ): Promise<LessonEventDto[]> {
-    const lessonEventDto = await this.googleCalendarService.getLessonsEvents(
-      month,
-      year,
-    );
-    return lessonEventDto;
+  async getLessons(@Query('month') month: number, @Query('year') year: number) {
+    const lessons = await this.lessonService.getLessons(month, year);
+    return lessons;
   }
 
   @Patch('/:id')
@@ -110,7 +103,7 @@ export class LessonController {
     );
 
     return {
-      message: `Aula do dia ${lessonCanceled.lessonDate.slice(-2)} cancelada!`,
+      message: `Aula cancelada!`,
       data: lessonCanceled,
     };
   }

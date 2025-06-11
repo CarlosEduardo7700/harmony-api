@@ -20,8 +20,8 @@ export class Lesson {
   @Column({ name: 'end_time', nullable: false })
   endTime: string;
 
-  @Column({ name: 'lesson_date', nullable: false })
-  lessonDate: string;
+  @Column({ type: 'date', name: 'lesson_date', nullable: false })
+  lessonDate: Date;
 
   @Column({ name: 'observations', length: 500 })
   observations: string;
