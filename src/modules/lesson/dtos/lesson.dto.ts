@@ -3,7 +3,7 @@ export class LessonDto {
   googleEventId: string;
   googleEventLink: string;
   title: string;
-  lessonDate: string | null;
+  lessonDate: Date;
   startTime: string;
   endTime: string;
   observations: string;
