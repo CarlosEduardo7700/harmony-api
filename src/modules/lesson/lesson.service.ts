@@ -105,7 +105,7 @@ export class LessonService {
         lessonDate: lesson.lessonDate,
         startTime: lesson.startTime,
         endTime: lesson.endTime,
-        observation: lesson.observations,
+        observations: lesson.observations,
       };
     });
 
