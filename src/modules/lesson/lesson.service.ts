@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from './lesson.entity';
 import { Between, IsNull, Repository } from 'typeorm';
@@ -46,7 +46,7 @@ export class LessonService {
     const lesson = await this.lessonRepository.findOneBy({ id });
 
     if (!lesson) {
-      throw new Error('Aula não encontrada!');
+      throw new NotFoundException('Aula não encontrada!');
     }
 
     updateLessonDto['updatedAt'] = new Date().toISOString();
@@ -71,7 +71,7 @@ export class LessonService {
     const lesson = await this.lessonRepository.findOneBy({ id });
 
     if (!lesson) {
-      throw new Error('Aula não encontrada!');
+      throw new NotFoundException('Aula não encontrada!');
     }
 
     lesson['deletedAt'] = new Date().toISOString();
