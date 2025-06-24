@@ -23,7 +23,7 @@ export class Lesson {
   @Column({ type: 'date', name: 'lesson_date', nullable: false })
   lessonDate: Date;
 
-  @Column({ name: 'observations', length: 500 })
+  @Column({ name: 'observations', length: 500, nullable: true })
   observations: string;
 
   @Column({ name: 'created_at', nullable: true })
