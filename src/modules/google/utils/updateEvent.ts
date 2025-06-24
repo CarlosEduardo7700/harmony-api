@@ -16,6 +16,10 @@ export function updateEvent(updateLessonDto: UpdateLessonDto, lessonEvent) {
     lessonEvent.data.end.dateTime,
   );
 
+  if (updateLessonDto.title) {
+    lessonData['summary'] = updateLessonDto.title;
+  }
+
   if (updateLessonDto.observations) {
     lessonData['description'] = updateLessonDto.observations;
   }
