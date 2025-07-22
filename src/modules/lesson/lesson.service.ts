@@ -1,29 +1,35 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from './lesson.entity';
 import { Between, IsNull, Repository } from 'typeorm';
-import { LessonDto } from './dtos/lesson.dto';
 import { convertUtcToBrIso } from 'src/utils/convertUtcToBrIso';
 import { UpdateLessonDto } from './dtos/update-lesson.dto';
+import { GoogleCalendarService } from '../google/google-calendar.service';
+import { CreateLessonDto } from './dtos/create-lesson.dto';
+import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
 
 @Injectable()
 export class LessonService {
   constructor(
     @InjectRepository(Lesson)
     private readonly lessonRepository: Repository<Lesson>,
+    private readonly googleCalendarService: GoogleCalendarService,
   ) {}
 
-  async saveToDatabase(data): Promise<LessonDto> {
+  async scheduleLesson(dto: CreateLessonDto) {
+    const googleCalendarResponse =
+      await this.googleCalendarService.scheduleLesson(dto);
+
     const lesson = new Lesson();
-    lesson.title = data.title;
-    lesson.startTime = data.startTime;
-    lesson.endTime = data.endTime;
-    lesson.lessonDate = data.lessonDate;
-    lesson.observations = data.observations;
-    lesson.googleEventId = data.googleEventId;
-    lesson.googleEventLink = data.googleEventLink;
+    lesson.title = dto.title;
+    lesson.startTime = dto.startTime;
+    lesson.endTime = dto.endTime;
+    lesson.lessonDate = new Date(dto.lessonDate);
+    lesson.observations = dto.observations || '';
+    lesson.googleEventId = googleCalendarResponse.eventId;
+    lesson.googleEventLink = googleCalendarResponse.eventLink;
     lesson.createdAt = new Date().toISOString();
     lesson.updatedAt = new Date().toISOString();
 
@@ -39,6 +45,23 @@ export class LessonService {
       googleEventId: databaseResponse.googleEventId,
       googleEventLink: databaseResponse.googleEventLink,
       createdAt: convertUtcToBrIso(databaseResponse.createdAt),
+    };
+  }
+
+  async scheduleLessonsWithRecurrence(dto: CreateLessonsWithRecurrenceDto) {
+    const googleCalendarResponse =
+      await this.googleCalendarService.scheduleLessonsWithRecurrence(dto);
+
+    for (const lesson of googleCalendarResponse) {
+      await this.scheduleLesson(lesson);
+    }
+
+    return {
+      recurringEventId: googleCalendarResponse[0].recurringEventId,
+      title: googleCalendarResponse[0].title,
+      observations: googleCalendarResponse[0].observations,
+      startTime: googleCalendarResponse[0].startTime,
+      endTime: googleCalendarResponse[0].endTime,
     };
   }
 
