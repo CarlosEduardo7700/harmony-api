@@ -103,6 +103,10 @@ export class LessonService {
 
     const databaseResponse = await this.lessonRepository.save(lesson);
 
+    await this.googleCalendarService.cancelLessonEvent(
+      databaseResponse.googleEventId,
+    );
+
     return {
       title: databaseResponse.title,
       lessonDate: databaseResponse.lessonDate,

@@ -70,10 +70,6 @@ export class LessonController {
   async cancelLesson(@Param('id') id: string) {
     const lessonCanceled = await this.lessonService.cancelLesson(id);
 
-    await this.googleCalendarService.cancelLessonEvent(
-      lessonCanceled.googleEventId,
-    );
-
     return {
       message: `Aula cancelada!`,
       data: lessonCanceled,
