@@ -66,6 +66,8 @@ export class LessonService {
   }
 
   async editLesson(id: string, updateLessonDto: UpdateLessonDto) {
+    await this.googleCalendarService.editLessonEvent(updateLessonDto);
+
     const lesson = await this.lessonRepository.findOneBy({ id });
 
     if (!lesson) {

@@ -55,8 +55,6 @@ export class LessonController {
     @Param('id') id: string,
     @Body() updateLessonDto: UpdateLessonDto,
   ) {
-    await this.googleCalendarService.editLessonEvent(updateLessonDto);
-
     const lessonUpdated = await this.lessonService.editLesson(
       id,
       updateLessonDto,
@@ -64,9 +62,7 @@ export class LessonController {
 
     return {
       message: 'Aula atualizada com sucesso!',
-      data: {
-        ...lessonUpdated,
-      },
+      data: lessonUpdated,
     };
   }
 
