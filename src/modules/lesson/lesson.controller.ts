@@ -12,14 +12,10 @@ import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
 import { UpdateLessonDto } from './dtos/update-lesson.dto';
-import { GoogleCalendarService } from '../google/google-calendar.service';
 
 @Controller('lesson')
 export class LessonController {
-  constructor(
-    private readonly lessonService: LessonService,
-    private readonly googleCalendarService: GoogleCalendarService,
-  ) {}
+  constructor(private readonly lessonService: LessonService) {}
 
   @Post()
   async scheduleLesson(@Body() createLessonDto: CreateLessonDto) {
