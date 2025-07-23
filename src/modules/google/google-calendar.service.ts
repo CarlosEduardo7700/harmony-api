@@ -17,6 +17,7 @@ import { createEvent } from './utils/createEvent';
 import { CreateLessonsWithRecurrenceDto } from '../lesson/dtos/create-lessons-with-recurrence.dto';
 import { UpdateLessonDto } from '../lesson/dtos/update-lesson.dto';
 import { updateEvent } from './utils/updateEvent';
+import { ScheduleLessonResponseDto } from './dtos/schedule-lesson-response.dto';
 
 @Injectable()
 export class GoogleCalendarService {
@@ -33,7 +34,9 @@ export class GoogleCalendarService {
     this.calendarId = this.configService.get<string>('CALENDAR_ID');
   }
 
-  async scheduleLesson(createLessonDto: CreateLessonDto) {
+  async scheduleLesson(
+    createLessonDto: CreateLessonDto,
+  ): Promise<ScheduleLessonResponseDto> {
     const lesson = createEvent(createLessonDto);
 
     const eventCreated = await this.calendar.events.insert({
