@@ -9,6 +9,7 @@ import { UpdateLessonDto } from './dtos/update-lesson.dto';
 import { GoogleCalendarService } from '../google/google-calendar.service';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
+import { LessonFactory } from './factories/lessonFactory';
 
 @Injectable()
 export class LessonService {
@@ -22,18 +23,13 @@ export class LessonService {
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLesson(dto);
 
-    const lesson = new Lesson();
-    lesson.title = dto.title;
-    lesson.startTime = dto.startTime;
-    lesson.endTime = dto.endTime;
-    lesson.lessonDate = new Date(dto.lessonDate);
-    lesson.observations = dto.observations || '';
-    lesson.googleEventId = googleCalendarResponse.eventId;
-    lesson.googleEventLink = googleCalendarResponse.eventLink;
-    lesson.createdAt = new Date().toISOString();
-    lesson.updatedAt = new Date().toISOString();
+    const lessonCreated = LessonFactory.createFromDto(
+      dto,
+      googleCalendarResponse.eventId,
+      googleCalendarResponse.eventLink,
+    );
 
-    const databaseResponse = await this.lessonRepository.save(lesson);
+    const databaseResponse = await this.lessonRepository.save(lessonCreated);
 
     return {
       id: databaseResponse.id,
