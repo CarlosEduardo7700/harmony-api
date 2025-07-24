@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +9,8 @@ import { CreateLessonDto } from '../dtos/create-lesson.dto';
 import { LessonFactory } from '../factories/lessonFactory';
 import { convertUtcToBrIso } from 'src/utils/convertUtcToBrIso';
 import { CreateLessonsWithRecurrenceDto } from '../dtos/create-lessons-with-recurrence.dto';
+import { ScheduleLessonResponseDto } from '../dtos/schedule-lesson-response.dto';
+import { ScheduleRecurringLessonResponseDto } from '../dtos/schedule-lesson-recurrence-response.dto';
 
 export class LessonScheduler {
   constructor(
@@ -16,7 +19,9 @@ export class LessonScheduler {
     private readonly googleCalendarService: GoogleCalendarService,
   ) {}
 
-  async scheduleLesson(dto: CreateLessonDto) {
+  async scheduleLesson(
+    dto: CreateLessonDto,
+  ): Promise<ScheduleLessonResponseDto> {
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLesson(dto);
 
@@ -37,11 +42,13 @@ export class LessonScheduler {
       observations: databaseResponse.observations,
       googleEventId: databaseResponse.googleEventId,
       googleEventLink: databaseResponse.googleEventLink,
-      createdAt: convertUtcToBrIso(databaseResponse.createdAt),
+      createdAt: convertUtcToBrIso(databaseResponse.createdAt)!,
     };
   }
 
-  async scheduleLessonsWithRecurrence(dto: CreateLessonsWithRecurrenceDto) {
+  async scheduleLessonsWithRecurrence(
+    dto: CreateLessonsWithRecurrenceDto,
+  ): Promise<ScheduleRecurringLessonResponseDto> {
     const googleCalendarResponse =
       await this.googleCalendarService.scheduleLessonsWithRecurrence(dto);
 
