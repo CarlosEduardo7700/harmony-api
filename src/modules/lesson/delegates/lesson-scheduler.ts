@@ -1,0 +1,60 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { InjectRepository } from '@nestjs/typeorm';
+import { Lesson } from '../lesson.entity';
+import { Repository } from 'typeorm';
+import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
+import { CreateLessonDto } from '../dtos/create-lesson.dto';
+import { LessonFactory } from '../factories/lessonFactory';
+import { convertUtcToBrIso } from 'src/utils/convertUtcToBrIso';
+import { CreateLessonsWithRecurrenceDto } from '../dtos/create-lessons-with-recurrence.dto';
+
+export class LessonScheduler {
+  constructor(
+    @InjectRepository(Lesson)
+    private readonly lessonRepository: Repository<Lesson>,
+    private readonly googleCalendarService: GoogleCalendarService,
+  ) {}
+
+  async scheduleLesson(dto: CreateLessonDto) {
+    const googleCalendarResponse =
+      await this.googleCalendarService.scheduleLesson(dto);
+
+    const lessonCreated = LessonFactory.createFromDto(
+      dto,
+      googleCalendarResponse.eventId,
+      googleCalendarResponse.eventLink,
+    );
+
+    const databaseResponse = await this.lessonRepository.save(lessonCreated);
+
+    return {
+      id: databaseResponse.id,
+      title: databaseResponse.title,
+      lessonDate: databaseResponse.lessonDate,
+      startTime: databaseResponse.startTime,
+      endTime: databaseResponse.endTime,
+      observations: databaseResponse.observations,
+      googleEventId: databaseResponse.googleEventId,
+      googleEventLink: databaseResponse.googleEventLink,
+      createdAt: convertUtcToBrIso(databaseResponse.createdAt),
+    };
+  }
+
+  async scheduleLessonsWithRecurrence(dto: CreateLessonsWithRecurrenceDto) {
+    const googleCalendarResponse =
+      await this.googleCalendarService.scheduleLessonsWithRecurrence(dto);
+
+    for (const lesson of googleCalendarResponse) {
+      await this.scheduleLesson(lesson);
+    }
+
+    return {
+      recurringEventId: googleCalendarResponse[0].recurringEventId,
+      title: googleCalendarResponse[0].title,
+      observations: googleCalendarResponse[0].observations,
+      startTime: googleCalendarResponse[0].startTime,
+      endTime: googleCalendarResponse[0].endTime,
+    };
+  }
+}

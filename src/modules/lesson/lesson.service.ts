@@ -1,139 +1,44 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Lesson } from './lesson.entity';
-import { Between, IsNull, Repository } from 'typeorm';
-import { convertUtcToBrIso } from 'src/utils/convertUtcToBrIso';
-import { UpdateLessonDto } from './dtos/update-lesson.dto';
-import { GoogleCalendarService } from '../google/google-calendar.service';
+import { Injectable } from '@nestjs/common';
+import { LessonScheduler } from './delegates/lesson-scheduler';
 import { CreateLessonDto } from './dtos/create-lesson.dto';
 import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
-import { LessonFactory } from './factories/lessonFactory';
+import { LessonReader } from './delegates/lesson-reader';
+import { LessonEditor } from './delegates/lesson-editor';
+import { UpdateLessonDto } from './dtos/update-lesson.dto';
+import { LessonCanceller } from './delegates/lesson-canceller';
 
 @Injectable()
 export class LessonService {
   constructor(
-    @InjectRepository(Lesson)
-    private readonly lessonRepository: Repository<Lesson>,
-    private readonly googleCalendarService: GoogleCalendarService,
+    private readonly lessonScheduler: LessonScheduler,
+    private readonly lessonReader: LessonReader,
+    private readonly lessonEditor: LessonEditor,
+    private readonly lessonCanceller: LessonCanceller,
   ) {}
 
   async scheduleLesson(dto: CreateLessonDto) {
-    const googleCalendarResponse =
-      await this.googleCalendarService.scheduleLesson(dto);
-
-    const lessonCreated = LessonFactory.createFromDto(
-      dto,
-      googleCalendarResponse.eventId,
-      googleCalendarResponse.eventLink,
-    );
-
-    const databaseResponse = await this.lessonRepository.save(lessonCreated);
-
-    return {
-      id: databaseResponse.id,
-      title: databaseResponse.title,
-      lessonDate: databaseResponse.lessonDate,
-      startTime: databaseResponse.startTime,
-      endTime: databaseResponse.endTime,
-      observations: databaseResponse.observations,
-      googleEventId: databaseResponse.googleEventId,
-      googleEventLink: databaseResponse.googleEventLink,
-      createdAt: convertUtcToBrIso(databaseResponse.createdAt),
-    };
+    const response = await this.lessonScheduler.scheduleLesson(dto);
+    return response;
   }
 
   async scheduleLessonsWithRecurrence(dto: CreateLessonsWithRecurrenceDto) {
-    const googleCalendarResponse =
-      await this.googleCalendarService.scheduleLessonsWithRecurrence(dto);
-
-    for (const lesson of googleCalendarResponse) {
-      await this.scheduleLesson(lesson);
-    }
-
-    return {
-      recurringEventId: googleCalendarResponse[0].recurringEventId,
-      title: googleCalendarResponse[0].title,
-      observations: googleCalendarResponse[0].observations,
-      startTime: googleCalendarResponse[0].startTime,
-      endTime: googleCalendarResponse[0].endTime,
-    };
-  }
-
-  async editLesson(id: string, updateLessonDto: UpdateLessonDto) {
-    await this.googleCalendarService.editLessonEvent(updateLessonDto);
-
-    const lesson = await this.lessonRepository.findOneBy({ id });
-
-    if (!lesson) {
-      throw new NotFoundException('Aula não encontrada!');
-    }
-
-    updateLessonDto['updatedAt'] = new Date().toISOString();
-
-    Object.assign(lesson, updateLessonDto);
-
-    const databaseResponse = await this.lessonRepository.save(lesson);
-
-    return {
-      id: databaseResponse.id,
-      title: databaseResponse.title,
-      lessonDate: databaseResponse.lessonDate,
-      startTime: databaseResponse.startTime,
-      endTime: databaseResponse.endTime,
-      observations: databaseResponse.observations,
-      googleEventId: databaseResponse.googleEventId,
-      googleEventLink: databaseResponse.googleEventLink,
-    };
-  }
-
-  async cancelLesson(id: string) {
-    const lesson = await this.lessonRepository.findOneBy({ id });
-
-    if (!lesson) {
-      throw new NotFoundException('Aula não encontrada!');
-    }
-
-    lesson['deletedAt'] = new Date().toISOString();
-
-    const databaseResponse = await this.lessonRepository.save(lesson);
-
-    await this.googleCalendarService.cancelLessonEvent(
-      databaseResponse.googleEventId,
-    );
-
-    return {
-      title: databaseResponse.title,
-      lessonDate: databaseResponse.lessonDate,
-      googleEventId: databaseResponse.googleEventId,
-    };
+    const response =
+      await this.lessonScheduler.scheduleLessonsWithRecurrence(dto);
+    return response;
   }
 
   async getLessons(month: number, year: number) {
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0);
+    const response = await this.lessonReader.getLessons(month, year);
+    return response;
+  }
 
-    const lessons = await this.lessonRepository.find({
-      where: {
-        lessonDate: Between(startDate, endDate),
-        deletedAt: IsNull(),
-      },
-    });
+  async editLesson(id: string, updateLessonDto: UpdateLessonDto) {
+    const response = await this.lessonEditor.editLesson(id, updateLessonDto);
+    return response;
+  }
 
-    const lessonsList = lessons.map((lesson) => {
-      return {
-        id: lesson.id,
-        googleEventId: lesson.googleEventId,
-        googleEventLink: lesson.googleEventLink,
-        title: lesson.title,
-        lessonDate: lesson.lessonDate,
-        startTime: lesson.startTime,
-        endTime: lesson.endTime,
-        observations: lesson.observations,
-      };
-    });
-
-    return lessonsList;
+  async cancelLesson(id: string) {
+    const response = await this.lessonCanceller.cancelLesson(id);
+    return response;
   }
 }
