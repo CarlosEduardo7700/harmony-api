@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
 import { UpdateLessonDto } from '../dtos/update-lesson.dto';
 import { NotFoundException } from '@nestjs/common';
+import { LessonDetailDto } from '../dtos/lesson-detail.dto';
 
 export class LessonEditor {
   constructor(
@@ -12,7 +13,10 @@ export class LessonEditor {
     private readonly googleCalendarService: GoogleCalendarService,
   ) {}
 
-  async editLesson(id: string, updateLessonDto: UpdateLessonDto) {
+  async editLesson(
+    id: string,
+    updateLessonDto: UpdateLessonDto,
+  ): Promise<LessonDetailDto> {
     await this.googleCalendarService.editLessonEvent(updateLessonDto);
 
     const lesson = await this.lessonRepository.findOneBy({ id });

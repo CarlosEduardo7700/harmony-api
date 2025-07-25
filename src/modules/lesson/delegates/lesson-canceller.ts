@@ -3,6 +3,7 @@ import { Lesson } from '../lesson.entity';
 import { Repository } from 'typeorm';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
 import { NotFoundException } from '@nestjs/common';
+import { LessonDetailDto } from '../dtos/lesson-detail.dto';
 
 export class LessonCanceller {
   constructor(
@@ -11,7 +12,7 @@ export class LessonCanceller {
     private readonly googleCalendarService: GoogleCalendarService,
   ) {}
 
-  async cancelLesson(id: string) {
+  async cancelLesson(id: string): Promise<LessonDetailDto> {
     const lesson = await this.lessonRepository.findOneBy({ id });
 
     if (!lesson) {
@@ -27,9 +28,14 @@ export class LessonCanceller {
     );
 
     return {
+      id: databaseResponse.id,
       title: databaseResponse.title,
       lessonDate: databaseResponse.lessonDate,
+      startTime: databaseResponse.startTime,
+      endTime: databaseResponse.endTime,
+      observations: databaseResponse.observations,
       googleEventId: databaseResponse.googleEventId,
+      googleEventLink: databaseResponse.googleEventLink,
     };
   }
 }

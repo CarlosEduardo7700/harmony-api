@@ -1,6 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from '../lesson.entity';
 import { Between, IsNull, Repository } from 'typeorm';
+import { LessonDetailDto } from '../dtos/lesson-detail.dto';
 
 export class LessonReader {
   constructor(
@@ -8,7 +9,7 @@ export class LessonReader {
     private readonly lessonRepository: Repository<Lesson>,
   ) {}
 
-  async getLessons(month: number, year: number) {
+  async getLessons(month: number, year: number): Promise<LessonDetailDto[]> {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
 
@@ -19,7 +20,7 @@ export class LessonReader {
       },
     });
 
-    const lessonsList = lessons.map((lesson) => {
+    const lessonsList: LessonDetailDto[] = lessons.map((lesson) => {
       return {
         id: lesson.id,
         googleEventId: lesson.googleEventId,
