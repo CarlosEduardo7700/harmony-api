@@ -2,9 +2,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from '../lesson.entity';
 import { Repository } from 'typeorm';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
-import { UpdateLessonDto } from '../dtos/update-lesson.dto';
 import { NotFoundException } from '@nestjs/common';
-import { LessonDetailDto } from '../dtos/lesson-detail.dto';
+import { LessonDetailDto } from '../dtos/response/lesson-detail.dto';
+import { UpdateLessonDto } from '../dtos/request/update-lesson.dto';
 
 export class LessonEditor {
   constructor(

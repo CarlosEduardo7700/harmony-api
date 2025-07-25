@@ -1,4 +1,4 @@
-import { CreateLessonsWithRecurrenceDto } from 'src/modules/lesson/dtos/create-lessons-with-recurrence.dto';
+import { CreateLessonsWithRecurrenceDto } from 'src/modules/lesson/dtos/request/create-lessons-with-recurrence.dto';
 import { convertWeekdaysToRRULE } from './convertWeekdaysToRRULE';
 import { convertDateToRRuleUntil } from './convertDateToRRuleUntil';
 

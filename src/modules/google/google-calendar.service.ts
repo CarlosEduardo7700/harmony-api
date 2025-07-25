@@ -6,7 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
-import { CreateLessonDto } from 'src/modules/lesson/dtos/create-lesson.dto';
+import { CreateLessonDto } from 'src/modules/lesson/dtos/request/create-lesson.dto';
 import { createEventWithRecurrence } from './utils/createEventWithRecurrence';
 import { LessonEventDto } from './dtos/lesson-event.dto';
 import { getFirstDayOfTheMonth } from './utils/getFirstDayOfTheMonth';
@@ -14,10 +14,10 @@ import { getLastDayOfTheMonth } from './utils/getLastDayOfTheMonth';
 import { getDateFromISOString } from './utils/getDateFromISOString';
 import { getTimeFromISOString } from './utils/getTimeFromISOString';
 import { createEvent } from './utils/createEvent';
-import { CreateLessonsWithRecurrenceDto } from '../lesson/dtos/create-lessons-with-recurrence.dto';
-import { UpdateLessonDto } from '../lesson/dtos/update-lesson.dto';
+import { CreateLessonsWithRecurrenceDto } from '../lesson/dtos/request/create-lessons-with-recurrence.dto';
 import { updateEvent } from './utils/updateEvent';
 import { ScheduleLessonResponseDto } from './dtos/schedule-lesson-response.dto';
+import { UpdateLessonDto } from '../lesson/dtos/request/update-lesson.dto';
 
 @Injectable()
 export class GoogleCalendarService {

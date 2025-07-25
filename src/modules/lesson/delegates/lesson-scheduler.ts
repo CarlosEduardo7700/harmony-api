@@ -5,11 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from '../lesson.entity';
 import { Repository } from 'typeorm';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
-import { CreateLessonDto } from '../dtos/create-lesson.dto';
+import { CreateLessonDto } from '../dtos/request/create-lesson.dto';
 import { LessonFactory } from '../factories/lessonFactory';
-import { CreateLessonsWithRecurrenceDto } from '../dtos/create-lessons-with-recurrence.dto';
-import { ScheduleRecurringLessonResponseDto } from '../dtos/schedule-lesson-recurrence-response.dto';
-import { LessonDetailDto } from '../dtos/lesson-detail.dto';
+import { CreateLessonsWithRecurrenceDto } from '../dtos/request/create-lessons-with-recurrence.dto';
+import { ScheduleRecurringLessonResponseDto } from '../dtos/response/schedule-lesson-recurrence-response.dto';
+import { LessonDetailDto } from '../dtos/response/lesson-detail.dto';
 
 export class LessonScheduler {
   constructor(

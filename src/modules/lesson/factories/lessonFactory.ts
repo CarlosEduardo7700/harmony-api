@@ -1,4 +1,4 @@
-import { CreateLessonDto } from '../dtos/create-lesson.dto';
+import { CreateLessonDto } from '../dtos/request/create-lesson.dto';
 import { Lesson } from '../lesson.entity';
 
 export class LessonFactory {

@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from '../lesson.entity';
 import { Between, IsNull, Repository } from 'typeorm';
-import { LessonDetailDto } from '../dtos/lesson-detail.dto';
+import { LessonDetailDto } from '../dtos/response/lesson-detail.dto';
 
 export class LessonReader {
   constructor(

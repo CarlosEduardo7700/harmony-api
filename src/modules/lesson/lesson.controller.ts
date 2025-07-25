@@ -9,9 +9,9 @@ import {
   Delete,
 } from '@nestjs/common';
 import { LessonService } from './lesson.service';
-import { CreateLessonDto } from './dtos/create-lesson.dto';
-import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
-import { UpdateLessonDto } from './dtos/update-lesson.dto';
+import { CreateLessonDto } from './dtos/request/create-lesson.dto';
+import { CreateLessonsWithRecurrenceDto } from './dtos/request/create-lessons-with-recurrence.dto';
+import { UpdateLessonDto } from './dtos/request/update-lesson.dto';
 
 @Controller('lesson')
 export class LessonController {

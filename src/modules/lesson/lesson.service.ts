@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { LessonScheduler } from './delegates/lesson-scheduler';
-import { CreateLessonDto } from './dtos/create-lesson.dto';
-import { CreateLessonsWithRecurrenceDto } from './dtos/create-lessons-with-recurrence.dto';
+import { CreateLessonDto } from './dtos/request/create-lesson.dto';
+import { CreateLessonsWithRecurrenceDto } from './dtos/request/create-lessons-with-recurrence.dto';
 import { LessonReader } from './delegates/lesson-reader';
 import { LessonEditor } from './delegates/lesson-editor';
-import { UpdateLessonDto } from './dtos/update-lesson.dto';
 import { LessonCanceller } from './delegates/lesson-canceller';
+import { UpdateLessonDto } from './dtos/request/update-lesson.dto';
 
 @Injectable()
 export class LessonService {
