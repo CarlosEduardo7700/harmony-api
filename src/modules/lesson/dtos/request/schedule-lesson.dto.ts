@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
   IsDateString,
   IsNotEmpty,
@@ -8,7 +7,7 @@ import {
   Matches,
 } from 'class-validator';
 
-export class CreateLessonDto {
+export class ScheduleLessonDto {
   @IsString()
   @IsNotEmpty({ message: 'O título é obrigatório.' })
   @Length(3, 100, { message: 'O título deve ter entre 3 e 100 caracteres.' })

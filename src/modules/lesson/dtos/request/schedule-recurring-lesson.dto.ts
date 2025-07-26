@@ -12,7 +12,7 @@ import {
   Min,
 } from 'class-validator';
 
-export class CreateLessonsWithRecurrenceDto {
+export class ScheduleRecurringLessonDto {
   @IsString()
   @IsNotEmpty({ message: 'O título é obrigatório.' })
   @Length(3, 100, { message: 'O título deve ter entre 3 e 100 caracteres.' })

@@ -9,12 +9,12 @@ import {
   Delete,
 } from '@nestjs/common';
 import { LessonService } from './lesson.service';
-import { CreateLessonDto } from './dtos/request/create-lesson.dto';
-import { CreateLessonsWithRecurrenceDto } from './dtos/request/create-lessons-with-recurrence.dto';
-import { UpdateLessonDto } from './dtos/request/update-lesson.dto';
 import { ControllerResponseDto } from './dtos/response/controller-response.dto';
 import { LessonDetailDto } from './dtos/response/lesson-detail.dto';
-import { ScheduleRecurringLessonResponseDto } from './dtos/response/schedule-lesson-recurrence-response.dto';
+import { ScheduleRecurringLessonResponseDto } from './dtos/response/schedule-recurring-lesson-response.dto';
+import { ScheduleLessonDto } from './dtos/request/schedule-lesson.dto';
+import { ScheduleRecurringLessonDto } from './dtos/request/schedule-recurring-lesson.dto';
+import { EditLessonDto } from './dtos/request/edit-lesson.dto';
 
 @Controller('lesson')
 export class LessonController {
@@ -22,10 +22,9 @@ export class LessonController {
 
   @Post()
   async scheduleLesson(
-    @Body() createLessonDto: CreateLessonDto,
+    @Body() dto: ScheduleLessonDto,
   ): Promise<ControllerResponseDto<LessonDetailDto>> {
-    const scheduledLesson =
-      await this.lessonService.scheduleLesson(createLessonDto);
+    const scheduledLesson = await this.lessonService.scheduleLesson(dto);
 
     return {
       message: 'Aula agendada com sucesso!',
@@ -35,10 +34,10 @@ export class LessonController {
 
   @Post('/schedule-with-recurrence')
   async scheduleLessonsWithRecurrence(
-    @Body() createLessonsDto: CreateLessonsWithRecurrenceDto,
+    @Body() dto: ScheduleRecurringLessonDto,
   ): Promise<ControllerResponseDto<ScheduleRecurringLessonResponseDto>> {
     const scheduledLessons =
-      await this.lessonService.scheduleLessonsWithRecurrence(createLessonsDto);
+      await this.lessonService.scheduleLessonsWithRecurrence(dto);
 
     return {
       message: 'Aulas agendadas com sucesso!',
@@ -61,12 +60,9 @@ export class LessonController {
   @Patch('/:id')
   async editLesson(
     @Param('id') id: string,
-    @Body() updateLessonDto: UpdateLessonDto,
+    @Body() dto: EditLessonDto,
   ): Promise<ControllerResponseDto<LessonDetailDto>> {
-    const editedLesson = await this.lessonService.editLesson(
-      id,
-      updateLessonDto,
-    );
+    const editedLesson = await this.lessonService.editLesson(id, dto);
 
     return {
       message: 'Aula atualizada com sucesso!',

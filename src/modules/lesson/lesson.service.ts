@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { LessonScheduler } from './delegates/lesson-scheduler';
-import { CreateLessonDto } from './dtos/request/create-lesson.dto';
-import { CreateLessonsWithRecurrenceDto } from './dtos/request/create-lessons-with-recurrence.dto';
 import { LessonReader } from './delegates/lesson-reader';
 import { LessonEditor } from './delegates/lesson-editor';
 import { LessonCanceller } from './delegates/lesson-canceller';
-import { UpdateLessonDto } from './dtos/request/update-lesson.dto';
+import { ScheduleLessonDto } from './dtos/request/schedule-lesson.dto';
+import { ScheduleRecurringLessonDto } from './dtos/request/schedule-recurring-lesson.dto';
+import { EditLessonDto } from './dtos/request/edit-lesson.dto';
 
 @Injectable()
 export class LessonService {
@@ -16,29 +16,29 @@ export class LessonService {
     private readonly lessonCanceller: LessonCanceller,
   ) {}
 
-  async scheduleLesson(dto: CreateLessonDto) {
-    const response = await this.lessonScheduler.scheduleLesson(dto);
-    return response;
+  async scheduleLesson(dto: ScheduleLessonDto) {
+    const scheduledLesson = await this.lessonScheduler.scheduleLesson(dto);
+    return scheduledLesson;
   }
 
-  async scheduleLessonsWithRecurrence(dto: CreateLessonsWithRecurrenceDto) {
-    const response =
+  async scheduleLessonsWithRecurrence(dto: ScheduleRecurringLessonDto) {
+    const scheduledLessons =
       await this.lessonScheduler.scheduleLessonsWithRecurrence(dto);
-    return response;
+    return scheduledLessons;
   }
 
   async getLessons(month: number, year: number) {
-    const response = await this.lessonReader.getLessons(month, year);
-    return response;
+    const lessons = await this.lessonReader.getLessons(month, year);
+    return lessons;
   }
 
-  async editLesson(id: string, updateLessonDto: UpdateLessonDto) {
-    const response = await this.lessonEditor.editLesson(id, updateLessonDto);
-    return response;
+  async editLesson(id: string, dto: EditLessonDto) {
+    const editedLesson = await this.lessonEditor.editLesson(id, dto);
+    return editedLesson;
   }
 
   async cancelLesson(id: string) {
-    const response = await this.lessonCanceller.cancelLesson(id);
-    return response;
+    const canceledLesson = await this.lessonCanceller.cancelLesson(id);
+    return canceledLesson;
   }
 }

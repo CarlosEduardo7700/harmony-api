@@ -6,7 +6,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
-import { CreateLessonDto } from 'src/modules/lesson/dtos/request/create-lesson.dto';
 import { createEventWithRecurrence } from './utils/createEventWithRecurrence';
 import { LessonEventDto } from './dtos/lesson-event.dto';
 import { getFirstDayOfTheMonth } from './utils/getFirstDayOfTheMonth';
@@ -14,10 +13,11 @@ import { getLastDayOfTheMonth } from './utils/getLastDayOfTheMonth';
 import { getDateFromISOString } from './utils/getDateFromISOString';
 import { getTimeFromISOString } from './utils/getTimeFromISOString';
 import { createEvent } from './utils/createEvent';
-import { CreateLessonsWithRecurrenceDto } from '../lesson/dtos/request/create-lessons-with-recurrence.dto';
 import { updateEvent } from './utils/updateEvent';
 import { ScheduleLessonResponseDto } from './dtos/schedule-lesson-response.dto';
-import { UpdateLessonDto } from '../lesson/dtos/request/update-lesson.dto';
+import { ScheduleLessonDto } from '../lesson/dtos/request/schedule-lesson.dto';
+import { ScheduleRecurringLessonDto } from '../lesson/dtos/request/schedule-recurring-lesson.dto';
+import { EditLessonDto } from '../lesson/dtos/request/edit-lesson.dto';
 
 @Injectable()
 export class GoogleCalendarService {
@@ -35,9 +35,9 @@ export class GoogleCalendarService {
   }
 
   async scheduleLesson(
-    createLessonDto: CreateLessonDto,
+    dto: ScheduleLessonDto,
   ): Promise<ScheduleLessonResponseDto> {
-    const lesson = createEvent(createLessonDto);
+    const lesson = createEvent(dto);
 
     const eventCreated = await this.calendar.events.insert({
       calendarId: this.calendarId,
@@ -50,10 +50,8 @@ export class GoogleCalendarService {
     };
   }
 
-  async scheduleLessonsWithRecurrence(
-    createLessonsDto: CreateLessonsWithRecurrenceDto,
-  ) {
-    const lesson = createEventWithRecurrence(createLessonsDto);
+  async scheduleLessonsWithRecurrence(dto: ScheduleRecurringLessonDto) {
+    const lesson = createEventWithRecurrence(dto);
 
     const eventsCreated = await this.calendar.events.insert({
       calendarId: this.calendarId,
@@ -75,8 +73,8 @@ export class GoogleCalendarService {
           googleEventId: lesson.id,
           googleEventLink: lesson.htmlLink,
           title: lesson.summary,
-          startTime: createLessonsDto.startTime,
-          endTime: createLessonsDto.endTime,
+          startTime: dto.startTime,
+          endTime: dto.endTime,
           lessonDate: getDateFromISOString(lesson.start.dateTime),
           observations: lesson.description,
         };
@@ -122,17 +120,17 @@ export class GoogleCalendarService {
     return lessonEventDto;
   }
 
-  async editLessonEvent(updateLessonDto: UpdateLessonDto) {
+  async editLessonEvent(dto: EditLessonDto) {
     const lessonEvent = await this.calendar.events.get({
       calendarId: this.calendarId,
-      eventId: updateLessonDto.googleEventId,
+      eventId: dto.googleEventId,
     });
 
-    const lessonData = updateEvent(updateLessonDto, lessonEvent);
+    const lessonData = updateEvent(dto, lessonEvent);
 
     const response = await this.calendar.events.patch({
       calendarId: this.calendarId,
-      eventId: updateLessonDto.googleEventId,
+      eventId: dto.googleEventId,
       requestBody: lessonData,
     });
 

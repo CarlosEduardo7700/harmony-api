@@ -1,4 +1,4 @@
-import { CreateLessonDto } from 'src/modules/lesson/dtos/request/create-lesson.dto';
+import { CreateLessonDto } from 'src/modules/lesson/dtos/request/schedule-lesson.dto';
 
 export function createEvent(createLessonDto: CreateLessonDto) {
   const lessonStartDateTime = `${createLessonDto.lessonDate}T${createLessonDto.startTime}:00-03:00`;

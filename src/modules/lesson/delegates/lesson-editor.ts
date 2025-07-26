@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
 import { NotFoundException } from '@nestjs/common';
 import { LessonDetailDto } from '../dtos/response/lesson-detail.dto';
-import { UpdateLessonDto } from '../dtos/request/update-lesson.dto';
+import { EditLessonDto } from '../dtos/request/edit-lesson.dto';
 
 export class LessonEditor {
   constructor(
@@ -13,11 +13,8 @@ export class LessonEditor {
     private readonly googleCalendarService: GoogleCalendarService,
   ) {}
 
-  async editLesson(
-    id: string,
-    updateLessonDto: UpdateLessonDto,
-  ): Promise<LessonDetailDto> {
-    await this.googleCalendarService.editLessonEvent(updateLessonDto);
+  async editLesson(id: string, dto: EditLessonDto): Promise<LessonDetailDto> {
+    await this.googleCalendarService.editLessonEvent(dto);
 
     const lesson = await this.lessonRepository.findOneBy({ id });
 
@@ -25,9 +22,9 @@ export class LessonEditor {
       throw new NotFoundException('Aula não encontrada!');
     }
 
-    updateLessonDto['updatedAt'] = new Date().toISOString();
+    dto['updatedAt'] = new Date().toISOString();
 
-    Object.assign(lesson, updateLessonDto);
+    Object.assign(lesson, dto);
 
     const databaseResponse = await this.lessonRepository.save(lesson);
 
