@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from '../lesson.entity';
 import { Repository } from 'typeorm';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
-import { LessonFactory } from '../factories/lessonFactory';
+import { LessonFactory } from '../factories/lesson.factory';
 import { ScheduleRecurringLessonResponseDto } from '../dtos/response/schedule-recurring-lesson-response.dto';
 import { LessonDetailDto } from '../dtos/response/lesson-detail.dto';
 import { ScheduleLessonDto } from '../dtos/request/schedule-lesson.dto';
