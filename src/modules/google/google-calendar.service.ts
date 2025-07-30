@@ -5,7 +5,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { google } from 'googleapis';
 import { createEventWithRecurrence } from './utils/createEventWithRecurrence';
 import { LessonEventDto } from './dtos/lesson-event.dto';
 import { getFirstDayOfTheMonth } from './utils/getFirstDayOfTheMonth';
@@ -18,19 +17,15 @@ import { ScheduleLessonResponseDto } from './dtos/schedule-lesson-response.dto';
 import { ScheduleLessonDto } from '../lesson/dtos/request/schedule-lesson.dto';
 import { ScheduleRecurringLessonDto } from '../lesson/dtos/request/schedule-recurring-lesson.dto';
 import { EditLessonDto } from '../lesson/dtos/request/edit-lesson.dto';
+import { CalendarFactory } from './factories/calendar.factory';
 
 @Injectable()
 export class GoogleCalendarService {
   private calendar;
   private calendarId;
 
-  constructor(private configService: ConfigService) {
-    const auth = new google.auth.GoogleAuth({
-      keyFile: 'src/credentials/google-service-account.json',
-      scopes: ['https://www.googleapis.com/auth/calendar'],
-    });
-
-    this.calendar = google.calendar({ version: 'v3', auth });
+  constructor(private readonly configService: ConfigService) {
+    this.calendar = CalendarFactory.create(configService);
     this.calendarId = this.configService.get<string>('CALENDAR_ID');
   }
 
