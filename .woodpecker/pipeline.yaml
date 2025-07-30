@@ -1,0 +1,9 @@
+steps:
+  - name: install
+    image: node
+    commands:
+      - npm install
+  - name: linter
+    image: node
+    commands:
+      - npm run lint
