@@ -1,9 +1,9 @@
-import { CreateLessonsWithRecurrenceDto } from 'src/modules/lesson/dtos/request/schedule-recurring-lesson.dto';
+import { ScheduleRecurringLessonDto } from 'src/modules/lesson/dtos/request/schedule-recurring-lesson.dto';
 import { convertWeekdaysToRRULE } from './convertWeekdaysToRRULE';
 import { convertDateToRRuleUntil } from './convertDateToRRuleUntil';
 
 export function createEventWithRecurrence(
-  createLessonsDto: CreateLessonsWithRecurrenceDto,
+  createLessonsDto: ScheduleRecurringLessonDto,
 ) {
   const lessonStartDateTime = `${createLessonsDto.startDate}T${createLessonsDto.startTime}:00-03:00`;
   const lessonEndDateTime = `${createLessonsDto.startDate}T${createLessonsDto.endTime}:00-03:00`;
