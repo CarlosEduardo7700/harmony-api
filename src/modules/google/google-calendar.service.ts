@@ -6,11 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createEventWithRecurrence } from './utils/createEventWithRecurrence';
-import { LessonEventDto } from './dtos/lesson-event.dto';
-import { getFirstDayOfTheMonth } from './utils/getFirstDayOfTheMonth';
-import { getLastDayOfTheMonth } from './utils/getLastDayOfTheMonth';
 import { getDateFromISOString } from './utils/getDateFromISOString';
-import { getTimeFromISOString } from './utils/getTimeFromISOString';
 import { updateEvent } from './utils/updateEvent';
 import { ScheduleEventResponseDto } from './dtos/response/schedule-event-response.dto';
 import { ScheduleRecurringLessonDto } from '../lesson/dtos/request/schedule-recurring-lesson.dto';
@@ -70,43 +66,6 @@ export class GoogleCalendarService {
       });
 
     return lessonsCreatedList;
-  }
-
-  async getLessonsEvents(
-    month: number,
-    year: number,
-  ): Promise<LessonEventDto[]> {
-    const firstDayOfTheMonth = getFirstDayOfTheMonth(year, month);
-    const lastDayOfTheMonth = getLastDayOfTheMonth(year, month);
-
-    const lessonsEvents = await this.calendar.events.list({
-      calendarId: this.calendarId,
-      timeMin: firstDayOfTheMonth,
-      timeMax: lastDayOfTheMonth,
-      singleEvents: true,
-      orderBy: 'startTime',
-      timeZone: 'America/Sao_Paulo',
-    });
-
-    const lessonEventDto: LessonEventDto[] = lessonsEvents.data.items.map(
-      (lesson) => {
-        const startTime = getTimeFromISOString(lesson.start.dateTime) + ':00';
-        const endTime = getTimeFromISOString(lesson.end.dateTime) + ':00';
-        const lessonDate = getDateFromISOString(lesson.start.dateTime);
-
-        return new LessonEventDto(
-          lesson.id,
-          lesson.htmlLink,
-          lesson.summary,
-          lesson.description,
-          startTime,
-          endTime,
-          lessonDate,
-        );
-      },
-    );
-
-    return lessonEventDto;
   }
 
   async editLessonEvent(dto: EditLessonDto) {
