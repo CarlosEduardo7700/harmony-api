@@ -11,38 +11,32 @@ import { getFirstDayOfTheMonth } from './utils/getFirstDayOfTheMonth';
 import { getLastDayOfTheMonth } from './utils/getLastDayOfTheMonth';
 import { getDateFromISOString } from './utils/getDateFromISOString';
 import { getTimeFromISOString } from './utils/getTimeFromISOString';
-import { createEvent } from './utils/createEvent';
 import { updateEvent } from './utils/updateEvent';
-import { ScheduleLessonResponseDto } from './dtos/schedule-lesson-response.dto';
-import { ScheduleLessonDto } from '../lesson/dtos/request/schedule-lesson.dto';
+import { ScheduleEventResponseDto } from './dtos/response/schedule-event-response.dto';
 import { ScheduleRecurringLessonDto } from '../lesson/dtos/request/schedule-recurring-lesson.dto';
 import { EditLessonDto } from '../lesson/dtos/request/edit-lesson.dto';
 import { CalendarFactory } from './factories/calendar.factory';
+import { EventScheduler } from './delegates/event-scheduler';
+import { ScheduleEventDto } from './dtos/request/schedule-event.dto';
 
 @Injectable()
 export class GoogleCalendarService {
   private calendar;
   private calendarId;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly eventScheduler: EventScheduler,
+  ) {
     this.calendar = CalendarFactory.create(configService);
     this.calendarId = this.configService.get<string>('CALENDAR_ID');
   }
 
-  async scheduleLesson(
-    dto: ScheduleLessonDto,
-  ): Promise<ScheduleLessonResponseDto> {
-    const lesson = createEvent(dto);
-
-    const eventCreated = await this.calendar.events.insert({
-      calendarId: this.calendarId,
-      requestBody: lesson,
-    });
-
-    return {
-      eventId: eventCreated.data.id,
-      eventLink: eventCreated.data.htmlLink,
-    };
+  async scheduleEvent(
+    dto: ScheduleEventDto,
+  ): Promise<ScheduleEventResponseDto> {
+    const response = this.eventScheduler.scheduleEvent(dto);
+    return response;
   }
 
   async scheduleLessonsWithRecurrence(dto: ScheduleRecurringLessonDto) {

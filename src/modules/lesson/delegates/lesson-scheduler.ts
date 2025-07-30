@@ -20,7 +20,13 @@ export class LessonScheduler {
 
   async scheduleLesson(dto: ScheduleLessonDto): Promise<LessonDetailDto> {
     const googleCalendarResponse =
-      await this.googleCalendarService.scheduleLesson(dto);
+      await this.googleCalendarService.scheduleEvent({
+        summary: dto.title,
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+        date: dto.lessonDate,
+        description: dto.observations,
+      });
 
     const lessonCreated = LessonFactory.createFromDto(
       dto,

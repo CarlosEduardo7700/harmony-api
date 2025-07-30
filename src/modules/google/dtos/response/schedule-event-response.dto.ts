@@ -1,4 +1,4 @@
-export class ScheduleLessonResponseDto {
+export class ScheduleEventResponseDto {
   eventId: string;
   eventLink: string;
 }
