@@ -2,7 +2,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from '../lesson.entity';
 import { Between, IsNull, Repository } from 'typeorm';
 import { LessonDetailDto } from '../dtos/response/lesson-detail.dto';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class LessonReader {
   constructor(
     @InjectRepository(Lesson)

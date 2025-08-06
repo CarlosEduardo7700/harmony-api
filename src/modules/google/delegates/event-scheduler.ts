@@ -4,7 +4,9 @@
 import { ScheduleEventDto } from '../dtos/request/schedule-event.dto';
 import { createEvent } from '../utils/createEvent';
 import { ScheduleEventResponseDto } from '../dtos/response/schedule-event-response.dto';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class EventScheduler {
   constructor(
     private readonly calendar,

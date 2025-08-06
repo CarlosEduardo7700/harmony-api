@@ -2,10 +2,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from '../lesson.entity';
 import { Repository } from 'typeorm';
 import { GoogleCalendarService } from 'src/modules/google/google-calendar.service';
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { LessonDetailDto } from '../dtos/response/lesson-detail.dto';
 import { EditLessonDto } from '../dtos/request/edit-lesson.dto';
 
+@Injectable()
 export class LessonEditor {
   constructor(
     @InjectRepository(Lesson)

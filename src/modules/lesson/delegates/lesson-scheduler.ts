@@ -10,7 +10,9 @@ import { ScheduleRecurringLessonResponseDto } from '../dtos/response/schedule-re
 import { LessonDetailDto } from '../dtos/response/lesson-detail.dto';
 import { ScheduleLessonDto } from '../dtos/request/schedule-lesson.dto';
 import { ScheduleRecurringLessonDto } from '../dtos/request/schedule-recurring-lesson.dto';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class LessonScheduler {
   constructor(
     @InjectRepository(Lesson)
