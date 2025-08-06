@@ -6,7 +6,7 @@ steps:
   - name: linter
     image: node
     commands:
-      - npm run lint
+      - npm run lint:check
   - name: format
     image: node
     commands:
