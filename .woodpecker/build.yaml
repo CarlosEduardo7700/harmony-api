@@ -1,0 +1,11 @@
+steps:
+  - name: install-dependencies
+    image: node
+    commands:
+      - npm ci
+  - name: build
+    image: node
+    commands:
+      - ls
+      - npm run build
+      - ls

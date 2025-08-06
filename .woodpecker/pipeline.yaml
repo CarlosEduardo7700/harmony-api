@@ -11,9 +11,3 @@ steps:
     image: node
     commands:
       - npm run format:check
-  - name: build
-    image: node
-    commands:
-      - ls
-      - npm run build
-      - ls
