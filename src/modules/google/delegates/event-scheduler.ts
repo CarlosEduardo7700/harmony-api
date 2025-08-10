@@ -5,13 +5,18 @@ import { ScheduleEventDto } from '../dtos/request/schedule-event.dto';
 import { createEvent } from '../utils/createEvent';
 import { ScheduleEventResponseDto } from '../dtos/response/schedule-event-response.dto';
 import { Injectable } from '@nestjs/common';
+import { CalendarFactory } from '../factories/calendar.factory';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EventScheduler {
-  constructor(
-    private readonly calendar,
-    private readonly calendarId,
-  ) {}
+  private calendar;
+  private calendarId;
+
+  constructor(private readonly configService: ConfigService) {
+    this.calendar = CalendarFactory.create(configService);
+    this.calendarId = this.configService.get<string>('CALENDAR_ID');
+  }
 
   async scheduleEvent(
     dto: ScheduleEventDto,
