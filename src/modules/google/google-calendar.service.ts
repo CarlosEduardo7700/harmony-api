@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { ScheduleEventResponseDto } from './dtos/response/schedule-event-response.dto';
-import { CalendarFactory } from './factories/calendar.factory';
 import { EventScheduler } from './delegates/event-scheduler';
 import { ScheduleEventDto } from './dtos/request/schedule-event.dto';
 import { EventCanceller } from './delegates/event-canceller';
@@ -12,18 +10,11 @@ import { ScheduleRecurringEventDto } from './dtos/request/schedule-recurring-eve
 
 @Injectable()
 export class GoogleCalendarService {
-  private calendar;
-  private calendarId;
-
   constructor(
-    private readonly configService: ConfigService,
     private readonly eventScheduler: EventScheduler,
     private readonly eventCanceller: EventCanceller,
     private readonly eventEditor: EventEditor,
-  ) {
-    this.calendar = CalendarFactory.create(configService);
-    this.calendarId = this.configService.get<string>('CALENDAR_ID');
-  }
+  ) {}
 
   async scheduleEvent(
     dto: ScheduleEventDto,
