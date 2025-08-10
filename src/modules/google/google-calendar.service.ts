@@ -14,6 +14,7 @@ import { EditLessonDto } from '../lesson/dtos/request/edit-lesson.dto';
 import { CalendarFactory } from './factories/calendar.factory';
 import { EventScheduler } from './delegates/event-scheduler';
 import { ScheduleEventDto } from './dtos/request/schedule-event.dto';
+import { EventCanceller } from './delegates/event-canceller';
 
 @Injectable()
 export class GoogleCalendarService {
@@ -23,6 +24,7 @@ export class GoogleCalendarService {
   constructor(
     private readonly configService: ConfigService,
     private readonly eventScheduler: EventScheduler,
+    private readonly eventCanceller: EventCanceller,
   ) {
     this.calendar = CalendarFactory.create(configService);
     this.calendarId = this.configService.get<string>('CALENDAR_ID');
@@ -85,10 +87,7 @@ export class GoogleCalendarService {
     return response;
   }
 
-  async cancelLessonEvent(eventId: string) {
-    await this.calendar.events.delete({
-      calendarId: this.calendarId,
-      eventId: eventId,
-    });
+  async cancelEvent(eventId: string) {
+    await this.eventCanceller.cancelEvent(eventId);
   }
 }
