@@ -15,7 +15,14 @@ export class LessonEditor {
   ) {}
 
   async editLesson(id: string, dto: EditLessonDto): Promise<LessonDetailDto> {
-    await this.googleCalendarService.editLessonEvent(dto);
+    await this.googleCalendarService.editEvent({
+      summary: dto.title,
+      startTime: dto.startTime,
+      endTime: dto.endTime,
+      date: dto.lessonDate,
+      description: dto.observations,
+      googleEventId: dto.googleEventId,
+    });
 
     const lesson = await this.lessonRepository.findOneBy({ id });
 

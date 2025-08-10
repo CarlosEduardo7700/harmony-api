@@ -7,14 +7,14 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createEventWithRecurrence } from './utils/createEventWithRecurrence';
 import { getDateFromISOString } from './utils/getDateFromISOString';
-import { updateEvent } from './utils/updateEvent';
 import { ScheduleEventResponseDto } from './dtos/response/schedule-event-response.dto';
 import { ScheduleRecurringLessonDto } from '../lesson/dtos/request/schedule-recurring-lesson.dto';
-import { EditLessonDto } from '../lesson/dtos/request/edit-lesson.dto';
 import { CalendarFactory } from './factories/calendar.factory';
 import { EventScheduler } from './delegates/event-scheduler';
 import { ScheduleEventDto } from './dtos/request/schedule-event.dto';
 import { EventCanceller } from './delegates/event-canceller';
+import { EventEditor } from './delegates/event-editor';
+import { EditEventDto } from './dtos/request/edit-event.dto';
 
 @Injectable()
 export class GoogleCalendarService {
@@ -25,6 +25,7 @@ export class GoogleCalendarService {
     private readonly configService: ConfigService,
     private readonly eventScheduler: EventScheduler,
     private readonly eventCanceller: EventCanceller,
+    private readonly eventEditor: EventEditor,
   ) {
     this.calendar = CalendarFactory.create(configService);
     this.calendarId = this.configService.get<string>('CALENDAR_ID');
@@ -70,20 +71,8 @@ export class GoogleCalendarService {
     return lessonsCreatedList;
   }
 
-  async editLessonEvent(dto: EditLessonDto) {
-    const lessonEvent = await this.calendar.events.get({
-      calendarId: this.calendarId,
-      eventId: dto.googleEventId,
-    });
-
-    const lessonData = updateEvent(dto, lessonEvent);
-
-    const response = await this.calendar.events.patch({
-      calendarId: this.calendarId,
-      eventId: dto.googleEventId,
-      requestBody: lessonData,
-    });
-
+  async editEvent(dto: EditEventDto) {
+    const response = this.eventEditor.editEvent(dto);
     return response;
   }
 
