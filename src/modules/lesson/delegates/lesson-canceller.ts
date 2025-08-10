@@ -24,7 +24,7 @@ export class LessonCanceller {
 
     const databaseResponse = await this.lessonRepository.save(lesson);
 
-    await this.googleCalendarService.cancelLessonEvent(
+    await this.googleCalendarService.cancelEvent(
       databaseResponse.googleEventId,
     );
 
