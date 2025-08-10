@@ -3,7 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ConfigService } from '@nestjs/config';
 import { CalendarFactory } from '../factories/calendar.factory';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class EventCanceller {
   private calendar;
   private calendarId;

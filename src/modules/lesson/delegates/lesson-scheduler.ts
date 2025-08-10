@@ -54,7 +54,16 @@ export class LessonScheduler {
     dto: ScheduleRecurringLessonDto,
   ): Promise<ScheduleRecurringLessonResponseDto> {
     const googleCalendarResponse =
-      await this.googleCalendarService.scheduleLessonsWithRecurrence(dto);
+      await this.googleCalendarService.scheduleEventsWithRecurrence({
+        summary: dto.title,
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+        startDate: dto.startDate,
+        endDate: dto.endDate,
+        description: dto.observations,
+        recurrence: dto.recurrence,
+        weekdays: dto.weekdays,
+      });
 
     for (const lesson of googleCalendarResponse) {
       await this.scheduleLesson(lesson);
