@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { InjectRepository } from '@nestjs/typeorm';
 import { Lesson } from '../lesson.entity';
 import { Repository } from 'typeorm';
@@ -32,8 +29,8 @@ export class LessonScheduler {
 
     const lessonCreated = LessonFactory.createFromDto(
       dto,
-      googleCalendarResponse.eventId,
-      googleCalendarResponse.eventLink,
+      googleCalendarResponse.eventId!,
+      googleCalendarResponse.eventLink!,
     );
 
     const databaseResponse = await this.lessonRepository.save(lessonCreated);

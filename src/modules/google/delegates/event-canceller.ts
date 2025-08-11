@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ConfigService } from '@nestjs/config';
 import { CalendarFactory } from '../factories/calendar.factory';
 import { Injectable } from '@nestjs/common';
+import { calendar_v3 } from 'googleapis';
 
 @Injectable()
 export class EventCanceller {
-  private calendar;
-  private calendarId;
+  private calendar: calendar_v3.Calendar;
+  private calendarId: string | undefined;
 
   constructor(private readonly configService: ConfigService) {
     this.calendar = CalendarFactory.create(configService);

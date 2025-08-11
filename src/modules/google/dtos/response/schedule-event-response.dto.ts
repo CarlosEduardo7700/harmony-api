@@ -1,4 +1,4 @@
 export class ScheduleEventResponseDto {
-  eventId: string;
-  eventLink: string;
+  eventId: string | null | undefined;
+  eventLink: string | null | undefined;
 }

@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ScheduleEventDto } from '../dtos/request/schedule-event.dto';
 import { createEvent } from '../utils/createEvent';
 import { ScheduleEventResponseDto } from '../dtos/response/schedule-event-response.dto';
@@ -12,11 +7,12 @@ import { ConfigService } from '@nestjs/config';
 import { createEventWithRecurrence } from '../utils/createEventWithRecurrence';
 import { getDateFromISOString } from '../utils/getDateFromISOString';
 import { ScheduleRecurringEventDto } from '../dtos/request/schedule-recurring-event.dto';
+import { calendar_v3 } from 'googleapis';
 
 @Injectable()
 export class EventScheduler {
-  private calendar;
-  private calendarId;
+  private calendar: calendar_v3.Calendar;
+  private calendarId: string | undefined;
 
   constructor(private readonly configService: ConfigService) {
     this.calendar = CalendarFactory.create(configService);
@@ -49,23 +45,31 @@ export class EventScheduler {
 
     const { id } = eventsCreated.data;
 
+    if (!id) {
+      throw new Error('ID não encontrado!');
+    }
+
     const eventsList = await this.calendar.events.instances({
       calendarId: this.calendarId,
       eventId: id,
     });
 
+    if (!eventsList.data.items) {
+      throw new Error('Itens não encontrados!');
+    }
+
     const lessonsCreatedList = eventsList.data.items
       .filter((event) => event.recurringEventId === id)
-      .map((lesson) => {
+      .map((lesson: calendar_v3.Schema$Event) => {
         return {
           recurringEventId: id,
           googleEventId: lesson.id,
           googleEventLink: lesson.htmlLink,
-          title: lesson.summary,
+          title: lesson.summary!,
           startTime: dto.startTime,
           endTime: dto.endTime,
-          lessonDate: getDateFromISOString(lesson.start.dateTime),
-          observations: lesson.description,
+          lessonDate: getDateFromISOString(lesson.start!.dateTime!),
+          observations: lesson.description!,
         };
       });
 

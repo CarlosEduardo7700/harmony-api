@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { CalendarFactory } from '../factories/calendar.factory';
 import { ConfigService } from '@nestjs/config';
 import { updateEvent } from '../utils/updateEvent';
 import { EditEventDto } from '../dtos/request/edit-event.dto';
+import { calendar_v3 } from 'googleapis';
 
 @Injectable()
 export class EventEditor {
-  private calendar;
-  private calendarId;
+  private calendar: calendar_v3.Calendar;
+  private calendarId: string | undefined;
 
   constructor(private readonly configService: ConfigService) {
     this.calendar = CalendarFactory.create(configService);

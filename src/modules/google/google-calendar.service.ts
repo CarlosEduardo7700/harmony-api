@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Injectable } from '@nestjs/common';
 import { ScheduleEventResponseDto } from './dtos/response/schedule-event-response.dto';
 import { EventScheduler } from './delegates/event-scheduler';
