@@ -13,4 +13,3 @@ steps:
       - ls
   # build da imagem
   # deploy
-
