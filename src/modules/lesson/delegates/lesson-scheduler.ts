@@ -63,7 +63,13 @@ export class LessonScheduler {
       });
 
     for (const lesson of googleCalendarResponse) {
-      await this.scheduleLesson(lesson);
+      const lessonCreated = LessonFactory.createFromDto(
+        lesson,
+        lesson.googleEventId!,
+        lesson.googleEventLink!,
+      );
+
+      await this.lessonRepository.save(lessonCreated);
     }
 
     return {
