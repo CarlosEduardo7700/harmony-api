@@ -12,7 +12,9 @@ export class LessonFactory {
     lesson.title = dto.title;
     lesson.startTime = dto.startTime;
     lesson.endTime = dto.endTime;
-    lesson.lessonDate = new Date(dto.lessonDate);
+    const lessonDate = new Date(dto.lessonDate);
+    lessonDate.setHours(lessonDate.getHours() + 3);
+    lesson.lessonDate = lessonDate;
     lesson.observations = dto.observations || '';
     lesson.googleEventId = eventId;
     lesson.googleEventLink = eventLink;
