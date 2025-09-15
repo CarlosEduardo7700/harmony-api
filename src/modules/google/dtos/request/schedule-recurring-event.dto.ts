@@ -12,11 +12,11 @@ import {
   Min,
 } from 'class-validator';
 
-export class CreateLessonsWithRecurrenceDto {
+export class ScheduleRecurringEventDto {
   @IsString()
   @IsNotEmpty({ message: 'O título é obrigatório.' })
   @Length(3, 100, { message: 'O título deve ter entre 3 e 100 caracteres.' })
-  title: string;
+  summary: string;
 
   @IsString()
   @Matches(/^([01]\d|2[0-3]):[0-5]\d$/, {
@@ -69,7 +69,7 @@ export class CreateLessonsWithRecurrenceDto {
   @Length(0, 500, {
     message: 'As observações devem ter no máximo 500 caracteres.',
   })
-  observations?: string;
+  description?: string;
 
   @IsInt({ message: 'A recorrência deve ser um número inteiro.' })
   @Min(1, { message: 'A recorrência deve ser de no mínimo 1 semana.' })

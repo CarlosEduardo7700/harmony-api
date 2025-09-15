@@ -1,4 +1,4 @@
-export class LessonDto {
+export class LessonDetailDto {
   id: string;
   googleEventId: string;
   googleEventLink: string;
@@ -7,5 +7,4 @@ export class LessonDto {
   startTime: string;
   endTime: string;
   observations: string;
-  createdAt: string | null;
 }

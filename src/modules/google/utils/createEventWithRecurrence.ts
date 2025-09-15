@@ -1,18 +1,16 @@
-import { CreateLessonsWithRecurrenceDto } from 'src/modules/lesson/dtos/create-lessons-with-recurrence.dto';
 import { convertWeekdaysToRRULE } from './convertWeekdaysToRRULE';
 import { convertDateToRRuleUntil } from './convertDateToRRuleUntil';
+import { ScheduleRecurringEventDto } from '../dtos/request/schedule-recurring-event.dto';
 
-export function createEventWithRecurrence(
-  createLessonsDto: CreateLessonsWithRecurrenceDto,
-) {
-  const lessonStartDateTime = `${createLessonsDto.startDate}T${createLessonsDto.startTime}:00-03:00`;
-  const lessonEndDateTime = `${createLessonsDto.startDate}T${createLessonsDto.endTime}:00-03:00`;
-  const periodEndDate = convertDateToRRuleUntil(createLessonsDto.endDate);
-  const weekdaysConverted = convertWeekdaysToRRULE(createLessonsDto.weekdays);
+export function createEventWithRecurrence(dto: ScheduleRecurringEventDto) {
+  const lessonStartDateTime = `${dto.startDate}T${dto.startTime}:00-03:00`;
+  const lessonEndDateTime = `${dto.startDate}T${dto.endTime}:00-03:00`;
+  const periodEndDate = convertDateToRRuleUntil(dto.endDate);
+  const weekdaysConverted = convertWeekdaysToRRULE(dto.weekdays);
 
   return {
-    summary: createLessonsDto.title,
-    description: createLessonsDto.observations,
+    summary: dto.summary,
+    description: dto.description,
     start: {
       dateTime: lessonStartDateTime,
       timeZone: 'America/Sao_Paulo',
@@ -22,7 +20,7 @@ export function createEventWithRecurrence(
       timeZone: 'America/Sao_Paulo',
     },
     recurrence: [
-      `RRULE:FREQ=WEEKLY;BYDAY=${weekdaysConverted};INTERVAL=${createLessonsDto.recurrence};UNTIL=${periodEndDate}`,
+      `RRULE:FREQ=WEEKLY;BYDAY=${weekdaysConverted};INTERVAL=${dto.recurrence};UNTIL=${periodEndDate}`,
     ],
   };
 }

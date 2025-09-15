@@ -1,12 +1,12 @@
-import { CreateLessonDto } from 'src/modules/lesson/dtos/create-lesson.dto';
+import { ScheduleEventDto } from '../dtos/request/schedule-event.dto';
 
-export function createEvent(createLessonDto: CreateLessonDto) {
-  const lessonStartDateTime = `${createLessonDto.lessonDate}T${createLessonDto.startTime}:00-03:00`;
-  const lessonEndDateTime = `${createLessonDto.lessonDate}T${createLessonDto.endTime}:00-03:00`;
+export function createEvent(createLessonDto: ScheduleEventDto) {
+  const lessonStartDateTime = `${createLessonDto.date}T${createLessonDto.startTime}:00-03:00`;
+  const lessonEndDateTime = `${createLessonDto.date}T${createLessonDto.endTime}:00-03:00`;
 
   return {
-    summary: createLessonDto.title,
-    description: createLessonDto.observations,
+    summary: createLessonDto.summary,
+    description: createLessonDto.description,
     start: {
       dateTime: lessonStartDateTime,
       timeZone: 'America/Sao_Paulo',

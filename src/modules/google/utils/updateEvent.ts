@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { UpdateLessonDto } from 'src/modules/lesson/dtos/update-lesson.dto';
+import { EditLessonDto } from 'src/modules/lesson/dtos/request/edit-lesson.dto';
 import { getDateFromISOString } from './getDateFromISOString';
 import { getTimeFromISOString } from './getTimeFromISOString';
 
-export function updateEvent(updateLessonDto: UpdateLessonDto, lessonEvent) {
+export function updateEvent(updateLessonDto: EditLessonDto, lessonEvent) {
   const lessonData = {};
   const currentEventDate = getDateFromISOString(
     lessonEvent.data.start.dateTime,
